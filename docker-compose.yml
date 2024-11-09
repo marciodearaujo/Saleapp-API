@@ -19,4 +19,4 @@ services:
     environment:
         - MYSQL_ROOT_PASSWORD=root # if you prefer, change the mysql root password here, before run the docker compose.
     volumes:
-      - /app/saleappbackend/db/database:/var/lib/mysql
+      - /app/Saleapp-API/db/database:/var/lib/mysql
