@@ -1,0 +1,22 @@
+services:
+  saleappback:
+    container_name: "saleappback"
+    restart: "always"
+    image: saleappback
+    user: root
+    depends_on:
+      - saleappdb
+    expose:
+      - 3000
+    ports:
+      - 3001:3000
+    env_file:
+      - /etc/environment
+  saleappdb:
+    container_name: "saleappdb"
+    restart: "always"
+    image: saleappdb
+    environment:
+        - MYSQL_ROOT_PASSWORD= #set your database root password here
+    volumes:
+      - /app/saleappbackend/db/database:/var/lib/mysql
