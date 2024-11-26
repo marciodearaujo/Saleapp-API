@@ -14,7 +14,7 @@ import {url as clientUrl} from "@/app/(tabs)/clients/index"
 //This variable define basic url to sales resources
 export const  url="http://34.232.74.209:3001/sales"
 
-const confirmRemoveAlert = (sale:Sale)=>{
+const confirmRemoveAlert = ()=>{
   return new Promise<boolean>((resolve,reject)=>{
     Alert.alert('Remover o regsitro de venda', 'Deseja remover esse registro de venda?', [
       {
@@ -26,28 +26,33 @@ const confirmRemoveAlert = (sale:Sale)=>{
   })
 }
 
+interface SaleClient{
+  id:number,
+  saleDate:string,
+  clientId:number,
+  client:Client
+}
+
   
 export default function salesScreenList() {
   const {refreshSaleList,refreshClientList,refreshSaleListNow}=useContext(GlobalAppContext)
-  const[sales,setSales]=useState<Array<Sale>>([])
-  const [clients,setClients]=useState<Array<Client>>([])
+  const[salesClient,setSalesClient]=useState<Array<SaleClient>>([])
   const[search,setSearch]=useState('')
 
-  const filteredSales=sales.filter((sale)=>sale.saleDate.includes(search)||sale.saleDate.toLowerCase().includes(search))
+  const filteredSales=salesClient.filter((sale)=>sale.saleDate.includes(search)||sale.saleDate.toLowerCase().includes(search))
 
   useEffect(()=>{
-    getSales()
+    getSalesClient()
     setSearch("")
-    const client=clients.filter((client)=>item.clientId===client.id)[0]
   },[refreshSaleList])
 
   useEffect(()=>{
-    getClients()
+    getSalesClient()
   },[refreshClientList])
 
   
-  function getSales(){
-    fetch(url,{
+  function getSalesClient(){
+    fetch(url+"?filter[include][]=client",{
       method:"get"
     })
     .then((response)=>{
@@ -55,28 +60,16 @@ export default function salesScreenList() {
     }
     )
     .then((data)=>{
-      setSales(data)
+      setSalesClient(data)
     })
     .catch((error)=>console.log(error))
   }
 
-  async function getClients(){
-    fetch(clientUrl,{
-      method:"get"
-    })
-    .then((response)=>{
-      return response.json()
-    }
-    )
-    .then((data)=>{
-      setClients(data)
-    })
-    .catch((error)=>console.log(error))
-  }
 
-  async function removesale(sale:Sale){
-    if(await confirmRemoveAlert(sale)){
-      fetch(url+"/"+sale.id,{
+
+  async function removesale(saleClient:SaleClient){
+    if(await confirmRemoveAlert()){
+      fetch(url+"/"+saleClient.id,{
         method:"delete"
       })
       .then(()=>{
@@ -119,12 +112,12 @@ export default function salesScreenList() {
                 params:{
                   id:item.id,
                   saleDate:item.saleDate,
-                  clientName:client.name
+                  clientName:item.client.name
                 }
               } 
               }>
                 <View style={styles.item}>
-                  <Text style={styles.clientText}>{client.name}</Text>
+                  <Text style={styles.clientText}>{item.client.name}</Text>
                   <Text style={styles.dateText}>Data: {new Date(item.saleDate).toLocaleDateString("pt-br")}</Text>    
                 </View>
                 
@@ -137,7 +130,7 @@ export default function salesScreenList() {
                   params:{
                     id:item.id,
                     saleDate:item.saleDate,
-                    clientName:client.name
+                    clientName:item.client.name
                   }
               }}   
               >
