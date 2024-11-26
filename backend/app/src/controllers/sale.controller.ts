@@ -20,7 +20,7 @@ import {
 import {Sale, SaleJsonInput} from '../models';
 import {SaleRepository} from '../repositories';
 import {RegisterSaleService} from '../services';
-import {inject} from '@loopback/context';
+import {service} from '@loopback/core';
 
 export class SaleController {
 
@@ -30,16 +30,16 @@ export class SaleController {
     @repository(SaleRepository)
     public saleRepository : SaleRepository,
 
-    @inject("RegisterSaleService")
-    private registerSaleService:RegisterSaleService
+    @service()
+    public registerSaleService:RegisterSaleService
   ) {}
 
-  @post('/sales')
+  @post('/sales/items')
   @response(200, {
     description: 'Sale model instance',
     content: {'application/json': {schema: getModelSchemaRef(Sale)}},
   })
-  async create(
+  async createComplete(
     @requestBody({
       content: {
         'application/json': {
@@ -53,6 +53,27 @@ export class SaleController {
     sale: Omit<SaleJsonInput, 'id'>,
   ): Promise<Sale> {
     return this.registerSaleService.save(sale)//this.saleRepository.create(sale);
+  }
+
+  @post('/sales')
+  @response(200, {
+    description: 'Sale model instance',
+    content: {'application/json': {schema: getModelSchemaRef(Sale)}},
+  })
+  async create(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Sale, {
+            title: 'NewSale',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    sale: Omit<Sale, 'id'>,
+  ): Promise<Sale> {
+    return this.saleRepository.create(sale)//this.saleRepository.create(sale);
   }
 
   @get('/sales/count')

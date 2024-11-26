@@ -1,23 +1,31 @@
-import {injectable,inject, BindingScope} from '@loopback/core';
+import {injectable,service, BindingScope} from '@loopback/core';
 import {SaleRepository} from '../repositories';
 import {repository} from '@loopback/repository';
-import {SaleJsonInput} from '../models';
+import {Sale, SaleJsonInput} from '../models';
 import {RegisterItemService} from './register-item.service';
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class RegisterSaleService {
 
 
-  constructor(@repository("SaleRpeository")
-  private saleRepository: SaleRepository,
+  constructor(@repository(SaleRepository)
+  public saleRepository: SaleRepository,
 
-  @inject("RegisterItemService")
-  private registerItemService:RegisterItemService) {}
+  @service()
+  public registerItemService:RegisterItemService) {}
 
   async save(saleJsonInput:SaleJsonInput){
     const {items, ...sale}=saleJsonInput
-    const savedSale= await this.saleRepository.create(sale)
-    const savedItems= await this.registerItemService.save(items)
-    return savedSale
+    let savedSale:Sale | null = null
+    try{
+      savedSale= await this.saleRepository.create(sale)
+      await this.registerItemService.save(items,savedSale.id)
+      return savedSale
+    }catch(error){
+      console.log("Ocorreu um erro ao registrar a venda:"+error)
+      if(savedSale)
+        this.saleRepository.delete(savedSale)
+      throw error
+    }
   }
 }

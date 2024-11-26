@@ -9,12 +9,14 @@ import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
 import {MySequence} from './sequence';
+import {RegisterItemService, RegisterSaleService} from './services';
 
 export {ApplicationConfig};
 
 export class AppApplication extends BootMixin(
   ServiceMixin(RepositoryMixin(RestApplication)),
 ) {
+
   constructor(options: ApplicationConfig = {}) {
     super(options);
 

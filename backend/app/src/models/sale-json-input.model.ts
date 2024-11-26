@@ -27,7 +27,7 @@ export class SaleJsonInput extends Model {
     itemType: 'object',
     required: true,
   })
-  items: Item[];
+  items: Object[];
 
 
   constructor(data?: Partial<SaleJsonInput>) {
