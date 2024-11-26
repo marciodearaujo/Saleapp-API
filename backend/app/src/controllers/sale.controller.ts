@@ -17,13 +17,21 @@ import {
   requestBody,
   response,
 } from '@loopback/rest';
-import {Sale} from '../models';
+import {Sale, SaleJsonInput} from '../models';
 import {SaleRepository} from '../repositories';
+import {RegisterSaleService} from '../services';
+import {inject} from '@loopback/context';
 
 export class SaleController {
+
+
+
   constructor(
     @repository(SaleRepository)
     public saleRepository : SaleRepository,
+
+    @inject("RegisterSaleService")
+    private registerSaleService:RegisterSaleService
   ) {}
 
   @post('/sales')
@@ -35,16 +43,16 @@ export class SaleController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Sale, {
+          schema: getModelSchemaRef(SaleJsonInput, {
             title: 'NewSale',
             exclude: ['id'],
           }),
         },
       },
     })
-    sale: Omit<Sale, 'id'>,
+    sale: Omit<SaleJsonInput, 'id'>,
   ): Promise<Sale> {
-    return this.saleRepository.create(sale);
+    return this.registerSaleService.save(sale)//this.saleRepository.create(sale);
   }
 
   @get('/sales/count')
