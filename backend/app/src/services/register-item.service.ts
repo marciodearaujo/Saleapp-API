@@ -25,7 +25,7 @@ export class RegisterItemService {
             saleId,
             ...item
           })
-          if(items.length===index)
+          if(items.length-1===index)
             resolve("Items saved!")
         }catch(error){
           throw new Error("Ocorreu um erro ao criar o item "+item+":"+error)

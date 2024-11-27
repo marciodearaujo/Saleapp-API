@@ -1,7 +1,15 @@
 import {Entity, model, property, hasMany} from '@loopback/repository';
 import {Sale} from './sale.model';
+import { table } from 'console';
 
-@model()
+@model({
+  settings:{
+    mysql:{
+      table:"client"
+    }
+  }
+} 
+)
 export class Client extends Entity {
   @property({
     type: 'number',

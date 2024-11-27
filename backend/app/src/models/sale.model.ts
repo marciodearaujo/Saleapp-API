@@ -3,7 +3,13 @@ import {Client} from './client.model';
 import {Product} from './product.model';
 import {Item} from './item.model';
 
-@model()
+@model({
+  settings:{
+    mysql:{
+      table:"sale"
+    }
+  }
+})
 export class Sale extends Entity {
   @property({
     type: 'number',
