@@ -9,7 +9,7 @@ import Product from "@/models/Product"
 
 
 
-export const url="http://localhost:3000/products"
+export const url="http://34.232.74.209:3001/products"
 
 const confirmRemoveAlert = (product:Product)=>{
 

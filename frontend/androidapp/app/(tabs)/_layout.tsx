@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import {GlobalAppProvider} from '@/context/globalAppContext';
 
 
+
 export default function TabsLayout() {
   return (
     <GlobalAppProvider>

@@ -1,5 +1,6 @@
 
 import { Stack } from 'expo-router';
+import { ShoppingCartProvider } from '@/context/shoppingCartContext';
 
 
 
@@ -8,7 +9,7 @@ export default function roductsPLayout() {
 
   
   return (
-
+    <ShoppingCartProvider>
       <Stack>
         <Stack.Screen 
           name="index"
@@ -51,6 +52,6 @@ export default function roductsPLayout() {
               }
         />
       </Stack>
-
+    </ShoppingCartProvider>
   );
 }

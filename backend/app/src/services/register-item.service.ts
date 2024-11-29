@@ -1,7 +1,7 @@
 import {injectable, /* inject, */ BindingScope} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {ItemRepository} from '../repositories';
-import {Item} from '../models';
+import {Product} from '../models';
 
 
 
@@ -17,13 +17,14 @@ export class RegisterItemService {
    * Add service methods here
    */
 
-  async save(items:Partial<Item>[],saleId?:number,){
+  async save(items:Partial<Product>[],saleId?:number,){
     return new Promise((resolve)=>{
       items.map(async (item,index)=>{
         try{
           await this.itemRepository.create({
             saleId,
-            ...item
+            productId:item.id,
+            amount:item.amount
           })
           if(items.length-1===index)
             resolve("Items saved!")

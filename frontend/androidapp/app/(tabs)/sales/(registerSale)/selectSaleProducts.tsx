@@ -1,30 +1,27 @@
 import {router, useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet, FlatList, Button, Modal, Pressable} from 'react-native';
+import { View, Text, StyleSheet, FlatList, Button, Modal, Pressable, Alert} from 'react-native';
 import { useEffect, useState, useContext } from 'react';
 import GlobalAppContext from '@/context/globalAppContext';
 import { SearchBar } from '@rneui/themed';
 import {url} from "@/app/(tabs)/sales/index"
-import Product from "@/models/Product"
-import Item from '@/models/Item';
+import Product from '@/models/Product';
 import {url as productUrl} from "@/app/(tabs)/products/index"
+import ShoppingCartContext from '@/context/shoppingCartContext';
 
-const itemUrl="http://34.232.74.209:3001/items"
-
-  
 export default function selectSaleProducts() {
-  const {refreshProductList,refreshSaleList,refreshClientList,refreshProductListNow,refreshSaleListNow,refreshClientListNow}=useContext(GlobalAppContext)
-  const[selectedItems, setSelectedItems]=useState<Array<Item>>([])
-  const[selectedProductId,setSelectedProductId]=useState(0)
+  const {refreshProductList,refreshSaleListNow}=useContext(GlobalAppContext)
+  const{updateClientCart,selectedClient}=useContext(ShoppingCartContext)
+  const[selectedProduct,setSelectedProduct]=useState<Product | null>(null)
   const[products,setProducts]=useState<Array<Product>>([])
   const[search,setSearch]=useState('')
   const[visible,setVisible]=useState(false)
-  const[amountItem,setAmountItem]=useState(0)
-
+  const[amountSelectedProduct,setAmountSelectedProduct]=useState(1)
+ 
   const filteredproducts=products.filter((product)=>product.description.includes(search)||product.description.toLowerCase().includes(search))
   const clientId=useLocalSearchParams().id
+
+  // console.log(cartProducts)
   
-
-
   useEffect(()=>{
     getProducts()
     setSearch("")
@@ -48,54 +45,22 @@ export default function selectSaleProducts() {
   function updateSearch(text:string){
     setSearch(text)
   }
-
-  async function save(items:Item[]){
-    const response= await fetch(url,{
-      method:"post",
-      body: JSON.stringify({
-        saleDate: new Date().toISOString(),
-        clientId: typeof clientId=="string"?parseInt(clientId):0
-      }),
-      headers:{
-        'Content-Type':"application/json"
-      }
-      }
-    )
-    const savedSale= await response.json().catch((error)=>{
-      console.log(error)
-    })
-    if(savedSale.id){
-    new Promise((resolve)=>
-      selectedItems.map(({productId,amount},index)=>{
-      fetch(itemUrl,{
-        method:"post",
-        body: JSON.stringify({
-          saleId:savedSale.id,
-          productId,
-          amount
-        }),
-        headers:{
-          'Content-Type':"application/json"
-        }
-        }
-      )
-      if(index===selectedItems.length-1)
-        resolve("Items saved!")
-      }))
-      .then((result)=>{
-        console.log(result)
-        refreshSaleListNow()
-        router.navigate("/(tabs)/sales")
-      })
-    }
-  }
-  
-
-  function setSelectedItemAndCloseModal(item:Item){
-    setSelectedItems(prev=>[...prev,item])
+ 
+  function cancelAndCloseModal(){
+    setAmountSelectedProduct(1)
     setVisible(false)
   }
-  
+
+  function addProdcutToCart(){
+    if(selectedProduct&&selectedClient){
+      updateClientCart(selectedClient,{...selectedProduct,amount:amountSelectedProduct})
+      setAmountSelectedProduct(1)
+      Alert.alert("Carrinho","produto "+selectedProduct?.description+"adicionado ao carrinho")
+      setVisible(false)
+    }
+    else
+      Alert.alert("Produto não selecinado","Selecione ao menos um produto")
+  }
 
   return (
     <View style={styles.container}> 
@@ -118,23 +83,32 @@ export default function selectSaleProducts() {
           <View key={item.id} style={styles.products}>
             <View style={styles.viewText}>
                 <Text onPress={()=>{
+                  setSelectedProduct(item)
                   setVisible(true)
-                  setSelectedProductId(item.id)}} style={styles.itemText}>{item.description}</Text>
+                  }} style={styles.itemText}>{item.description}</Text>
+                <Text onPress={()=>{
+                setSelectedProduct(item)
+                setVisible(true)
+                }} style={styles.amountText}>Estoque:{item.amount}</Text>
             </View>
             <View>
             </View>   
           </View>}
       /> 
       <Modal visible={visible} animationType='slide' transparent={true}>
-          <Pressable onPress={()=>setSelectedItemAndCloseModal({productId:selectedProductId,amount:amountItem})} style={styles.backArea}>
+          <Pressable onPress={()=>cancelAndCloseModal()} style={styles.backArea}>
           </Pressable>
             <View style={styles.amountData}>
-              <Button onPress={()=>amountItem > 0?setAmountItem((prev)=>prev-1):setAmountItem(0)} title='-'/>
-                <Text >{amountItem}</Text>
-              <Button onPress={()=>setAmountItem((prev)=>prev+1)} title='+'/> 
+              <Button onPress={()=>amountSelectedProduct > 1?setAmountSelectedProduct((prev)=>prev-1):setAmountSelectedProduct(1)} title='-'/>
+                <Text >{amountSelectedProduct}</Text>
+              <Button onPress={()=>{
+                if(selectedProduct)
+                  amountSelectedProduct<selectedProduct.amount?setAmountSelectedProduct((prev)=>prev+1):selectedProduct.amount}}
+                      title='+'/>
             </View>
+            <Button title='adicionar no carrinho' onPress={()=>addProdcutToCart()}></Button>
+           
       </Modal> 
-      <Button title="concluir" onPress={()=>save(selectedItems)}/>
     </View>
   );
 }
@@ -152,8 +126,9 @@ const styles = StyleSheet.create({
     alignSelf:'flex-start'
   },
   itemText: {
+    fontWeight:"bold",
     padding: 10,
-    fontSize: 18,
+    fontSize: 20,
     height: 44,
   },
   textInput:{
@@ -161,27 +136,33 @@ const styles = StyleSheet.create({
     width:"100%",
     margin:10,
     padding:10,
-},
-products:{
-  flex:1,
-  flexDirection:'row',
-  justifyContent:'center',
-  width:"100%",
-  margin:20,
-  borderBottomWidth:1
-},
-viewText:{
-  width:"100%"
-},
-backArea:{
-  height:"50%",
-  backgroundColor:"rgba(24,24,24,0.6)",
-},
-amountData:{
-  flex:1,
-  flexDirection:"row",
-  alignItems:"center",
-  height:"50%",
-  width:"80%"
-}
+  },
+  amountText:{
+    padding: 10,
+    fontSize: 16,
+    height: 44,
+  },
+  products:{
+    flex:1,
+    flexDirection:'row',
+    justifyContent:'center',
+    width:"100%",
+    margin:20,
+    borderBottomWidth:1
+  },
+  viewText:{
+    width:"100%"
+  },
+  backArea:{
+    height:"50%",
+    backgroundColor:"rgba(24,24,24,0.6)",
+  },
+  amountData:{
+    flex:1,
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"center",
+    height:"50%",
+    width:"80%"
+  }
 })

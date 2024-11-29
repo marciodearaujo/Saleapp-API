@@ -1,1 +1,3 @@
 /EC2KeyPairs
+/backend/db/volume/*
+/backend/db/Dockerfile

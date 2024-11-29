@@ -1,20 +1,21 @@
 import { Link, router } from 'expo-router';
-import { View, Text, StyleSheet, FlatList, Alert, Button} from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert, Button, Pressable} from 'react-native';
 import { useEffect, useState, useContext } from 'react';
 import GlobalAppContext from '@/context/globalAppContext';
 import { SearchBar } from '@rneui/themed';
 import {url} from "@/app/(tabs)/clients/index"
 import Client from "@/models/Client"
+import ShoppingCartContext from '@/context/shoppingCartContext';
 
 
   
 export default function saleSelectClient() {
-  const {refreshClientList,refreshClientListNow}=useContext(GlobalAppContext)
-  const[selectedClient, setSelectdClient]=useState<Client>()
-  const[itens,setItens]=useState<Array<Client>>([])
+  const {refreshClientList}=useContext(GlobalAppContext)
+  const {setSelectedClient}=useContext(ShoppingCartContext)
+  const[clients,setClients]=useState<Array<Client>>([])
   const[search,setSearch]=useState('')
 
-  const filteredItens=itens.filter((client)=>client.name.includes(search)||client.name.toLowerCase().includes(search))
+  const filteredItens=clients.filter((client)=>client.name.includes(search)||client.name.toLowerCase().includes(search))
 
   useEffect(()=>{
     getClients()
@@ -31,13 +32,18 @@ export default function saleSelectClient() {
     }
     )
     .then((data)=>{
-      setItens(data)
+      setClients(data)
     })
     .catch((error)=>console.log(error))
   }
 
   function updateSearch(text:string){
     setSearch(text)
+  }
+
+  function nextPage(client:Client){
+    setSelectedClient(client)
+    router.navigate("./selectSaleProducts")
   }
 
   return (
@@ -60,17 +66,9 @@ export default function saleSelectClient() {
         renderItem={({item}) =>
           <View key={item.id} style={styles.itens}>
             <View style={styles.viewText}>
-              <Link href={{
-                pathname:"/(tabs)/sales/(registerSale)/selectSaleProducts",
-                params:{
-                  id:item.id,
-                  name:item.name,
-                  phone:item.phone
-                }
-              } 
-              }>
+              <Pressable onPress={()=>nextPage(item)}>
                 <Text style={styles.itemText}>{item.name}</Text>
-              </Link>
+              </Pressable>
             </View>
             <View>
             </View>   

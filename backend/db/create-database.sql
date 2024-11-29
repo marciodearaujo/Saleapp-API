@@ -32,4 +32,4 @@ alter table item add constraint item_product_reference foreign key(product_id) r
 alter table item drop constraint item_product_reference;
 alter table item add constraint item_product_reference foreign key(product_id) references product(id) on delete no action on update cascade;
 
-alter table Product add column removed boolean not null default true;
+alter table Product add column removed boolean not null default false;

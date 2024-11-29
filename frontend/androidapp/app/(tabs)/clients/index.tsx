@@ -7,7 +7,7 @@ import { SearchBar } from '@rneui/themed';
 import Client from '@/models/Client';
 
 //This variable define basic url to clients resources
-export const  url="http://localhost:3000/clients"
+export const  url="http://34.232.74.209:3001/clients"
 
 const confirmRemoveAlert = (client:Client)=>{
   return new Promise<boolean>((resolve,reject)=>{

@@ -12,7 +12,7 @@ import {url as clientUrl} from "@/app/(tabs)/clients/index"
 
 
 //This variable define basic url to sales resources
-export const  url="http://localhost:3000/sales"
+export const  url="http://34.232.74.209:3001/sales"
 
 const confirmRemoveAlert = ()=>{
   return new Promise<boolean>((resolve,reject)=>{
@@ -60,7 +60,6 @@ export default function salesScreenList() {
     }
     )
     .then((data)=>{
-      console.log(data)
       setSalesClient(data)
     })
     .catch((error)=>console.log(error))
