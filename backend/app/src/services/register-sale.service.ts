@@ -15,11 +15,11 @@ export class RegisterSaleService {
   public registerItemService:RegisterItemService) {}
 
   async save(saleJsonInput:SaleJsonInput){
-    const {items, ...sale}=saleJsonInput
+    const {products, ...sale}=saleJsonInput
     let savedSale:Sale | null = null
     try{
       savedSale= await this.saleRepository.create(sale)
-      await this.registerItemService.save(items,savedSale.id)
+      await this.registerItemService.save(products,savedSale.id)
       return savedSale
     }catch(error){
       console.log("Ocorreu um erro ao registrar a venda:"+error)
