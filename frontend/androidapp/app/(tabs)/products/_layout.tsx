@@ -12,7 +12,7 @@ export default function roductsPLayout() {
         }
       />
       <Stack.Screen 
-        name="productRegisterForm" 
+        name="registerProduct" 
         options={
             {
             headerShown: false,
@@ -22,7 +22,7 @@ export default function roductsPLayout() {
             }
       />
       <Stack.Screen 
-        name="productDetails" 
+        name="describeProduct" 
         options={
             {
             headerShown: false,
@@ -32,7 +32,7 @@ export default function roductsPLayout() {
             }
       />
       <Stack.Screen 
-        name="productEditForm" 
+        name="editProduct" 
         options={
             {
             headerShown: false,

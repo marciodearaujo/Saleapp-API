@@ -50,3 +50,15 @@ export async function getClients():Promise<Client[]>{
     }
     
 }
+
+ export async function findClientById(id:number):Promise<Client>{
+        try{
+            const response=await fetch(url+"/"+id,{
+                method:"get"
+            })
+            return await response.json()
+        }catch(error){
+            console.log(error)
+            throw error
+        }   
+}

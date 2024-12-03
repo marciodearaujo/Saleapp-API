@@ -6,7 +6,8 @@ import GlobalAppContext from '@/contexts/globalAppContext';
 import { Alert } from 'react-native';
 import { SearchBar } from '@rneui/themed';
 import Product from "@/models/Product"
-import { getProducts } from '@/backednAPIRequests/productRequests';
+import { getProducts, removeProduct } from '@/backednAPIRequests/productRequests';
+import ToastManager from 'toastify-react-native';
 
 
 
@@ -35,7 +36,7 @@ export default function productsScreenList() {
   const filteredItens=products.filter((product)=>product.description.includes(search)|| product.description.toLowerCase().includes(search))
   
   useEffect(()=>{
-    getProducts()
+    setList()
     setSearch("")
   },[refreshProductList])
 
@@ -44,21 +45,10 @@ export default function productsScreenList() {
     setProducts(products)
   }
 
-  function registerProduct(){
-    router.navigate("/(tabs)/products/registerProduct")
-  }
-
-  async function removeProduct(product:Product){
-    if(await confirmRemoveAlert(product)){
-      fetch(url+"/"+product.id,{
-        method:"delete"
-      })
-      .then(()=>{
-        refreshProductListNow()
-      }
-      )
-      .catch((error)=>console.log(error))
-
+  async function remove(product:Product){
+    if(await confirmRemoveAlert(product) && product.id){
+        await removeProduct(product.id)
+      refreshProductListNow()
     }       
   }
 
@@ -68,6 +58,7 @@ export default function productsScreenList() {
 
   return (
     <View style={styles.container}>
+      <ToastManager duration={2000}/>
       <SearchBar
       platform='android'
       placeholder="Buscar..."
@@ -111,12 +102,12 @@ export default function productsScreenList() {
                 sex:item.sex
               }
             }}><Ionicons name="pencil" size={24} color="black" /></Link>
-            <Ionicons onPress={()=>removeProduct(item)} name="trash" size={24} color="black" />
+            <Ionicons onPress={()=>remove(item)} name="trash" size={24} color="black" />
           </View>
           
         </View>}
       />
-       <Button title="Novo Produto" onPress={()=>registerProduct()}/>
+       <Button title="Novo Produto" onPress={()=>router.navigate("/(tabs)/products/registerProduct")}/>
     </View>
   );
 }

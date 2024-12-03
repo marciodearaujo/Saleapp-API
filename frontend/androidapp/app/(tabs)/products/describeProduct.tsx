@@ -4,6 +4,8 @@ import GlobalAppContext from "@/contexts/globalAppContext";
 import { useContext, useEffect, useState } from "react";
 import {url} from "./index"
 import Product from "@/models/Product";
+import ProductDetails from "@/components/ProductDetais";
+import { getProductById } from "@/backednAPIRequests/productRequests";
 
 
 const confirmRemoveAlert = async (product:Product)=>{
@@ -22,18 +24,20 @@ const confirmRemoveAlert = async (product:Product)=>{
 
 export default function productDetails(){
     const {refreshProductList,refreshProductListNow}=useContext(GlobalAppContext)
-    const selectedproduct=useLocalSearchParams()
-    const [productDetails,setproductDetails]=useState<Product>(selectedproduct as unknown as Product)
+    const selectedProduct=useLocalSearchParams()
+    const [productDetails,setproductDetails]=useState<Product>(selectedProduct as unknown as Product)
 
     useEffect(()=>{
-        async function getproduct(id:number){
-            const response= await fetch(url+"/"+selectedproduct.id,{
-                method:"get"
-            })
-            setproductDetails(await response.json())
-        }
-        getproduct(productDetails.id)
+        setProduct()
     },[refreshProductList])
+
+    async function setProduct(){
+      if(typeof selectedProduct.id==="string"){
+        const product =await getProductById(parseInt(selectedProduct.id))
+        setproductDetails(product)
+      }
+      
+    }
     
     async function removeproduct(product:Product){
         if(await confirmRemoveAlert(product)){
@@ -54,12 +58,7 @@ export default function productDetails(){
 
     return(
         <View style={styles.container}>
-            <View style={styles.detailArea}>
-                <Text style={styles.text}>Descrição: {productDetails.description}</Text>
-                <Text style={styles.text}>Preço: {("R$ "+productDetails.price).replace(".",",")}</Text>
-                <Text style={styles.text}>Quantidade: {productDetails.amount}</Text>
-                <Text style={styles.text}>Sexo: {productDetails?.sex==="both"?"Unissex":productDetails?.sex==="female"?"Feminino":"Masculino"}</Text>
-            </View>
+            <ProductDetails product={productDetails}/>
             <View style={styles.actionBar}>
                 <Button onPress={ 
                     ()=>router.navigate({
@@ -87,15 +86,6 @@ const styles=StyleSheet.create({
         flexDirection:"column",
         paddingBottom:30
       },
-    detailArea:{
-        flex:1,
-        justifyContent:"flex-start",
-    },
-    text:{
-        fontSize: 18,
-        height: 44,
-        margin:10
-    },
     actionBar:{
         flexDirection:"row",
         justifyContent:"space-evenly",

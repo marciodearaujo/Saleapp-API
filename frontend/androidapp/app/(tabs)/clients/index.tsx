@@ -23,6 +23,7 @@ const confirmRemoveAlert = (client:Client)=>{
   })
 }
 
+
   
 export default function clientsScreenList() {
   const {refreshClientList,refreshClientListNow}=useContext(GlobalAppContext)

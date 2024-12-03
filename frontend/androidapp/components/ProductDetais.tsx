@@ -1,22 +1,23 @@
-import Client from "@/models/Client"
-import {View, Text, StyleSheet } from "react-native"
+import Product from "@/models/Product"
+import { View, Text, StyleSheet} from "react-native"
 
-interface props{
-    clientData:Client
+interface Props{
+    product:Product
 }
 
-export default function ClientDetails({clientData}:props){
+export default function ProductDetails({product}:Props){
     return(
-            <View style={styles.container}>
-                <Text style={styles.text}>Nome: {clientData.name}</Text>
-                <Text style={styles.text}>Telefone: {clientData?.phone}</Text>          
-            </View>   
+        <View style={styles.detailArea}>
+                <Text style={styles.text}>Descrição: {product.description}</Text>
+                <Text style={styles.text}>Preço: {("R$ "+product.price).replace(".",",")}</Text>
+                <Text style={styles.text}>Quantidade: {product.amount}</Text>
+                <Text style={styles.text}>Sexo: {product?.sex==="both"?"Unissex":product?.sex==="female"?"Feminino":"Masculino"}</Text>
+        </View>
     )
-
 }
 
 const styles=StyleSheet.create({
-    container:{
+    detailArea:{
         flex:1,
         justifyContent:"flex-start",
     },

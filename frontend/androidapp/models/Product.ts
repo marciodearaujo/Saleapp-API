@@ -1,7 +1,7 @@
 export default  interface Product{
-    id:number,
+    id?:number,
     description:string,
     price:number,
     amount:number,
-    sex:string
+    sex?:string
   }

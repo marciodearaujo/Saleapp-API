@@ -6,6 +6,7 @@ import Client from "@/models/Client";
 import {url} from "./index"
 import ClientDetails from "@/components/ClientDetails";
 import  ToastManager from "toastify-react-native";
+import { findClientById } from "@/backednAPIRequests/clientRequests";
 
 const confirmRemoveAlert = async (client:Client)=>{
 
@@ -28,14 +29,15 @@ export default function clientDetails(){
     
 
     useEffect(()=>{
-        async function getClient(id:number | undefined){
-            const response= await fetch(url+"/"+id,{
-                method:"get"
-            })
-            setClientDetails(await response.json())
-        }
-        getClient(clientDetails.id)
+      setClient()
     },[refreshClientList])
+
+    async function setClient(){
+      if(typeof selectedClient.id==="string"){
+        const clientDetails= await findClientById(parseInt(selectedClient.id))
+        setClientDetails(clientDetails)
+      }
+    }
     
     async function removeClient(client:Client){
     

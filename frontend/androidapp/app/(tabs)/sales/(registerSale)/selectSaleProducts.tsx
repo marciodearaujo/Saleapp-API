@@ -7,6 +7,8 @@ import {url} from "@/app/(tabs)/sales/index"
 import Product from '@/models/Product';
 import {url as productUrl} from "@/app/(tabs)/products/index"
 import ShoppingCartContext from '@/contexts/shoppingCartContext';
+import ProductForm from '@/components/ProductForm';
+import { postProduct } from '@/backednAPIRequests/productRequests';
 
 export default function selectSaleProducts() {
   const {refreshProductList,refreshSaleListNow}=useContext(GlobalAppContext)
@@ -14,7 +16,8 @@ export default function selectSaleProducts() {
   const[selectedProduct,setSelectedProduct]=useState<Product | null>(null)
   const[products,setProducts]=useState<Array<Product>>([])
   const[search,setSearch]=useState('')
-  const[visible,setVisible]=useState(false)
+  const[amountFormVisible,setAmountFormVisible]=useState(false)
+  const[newProductVisible,setNewProductVisible]=useState(false)
   const[amountSelectedProduct,setAmountSelectedProduct]=useState(1)
  
   const filteredproducts=products.filter((product)=>product.description.includes(search)||product.description.toLowerCase().includes(search))
@@ -48,18 +51,24 @@ export default function selectSaleProducts() {
  
   function cancelAndCloseModal(){
     setAmountSelectedProduct(1)
-    setVisible(false)
+    setAmountFormVisible(false)
   }
 
-  function addProdcutToCart(){
-    if(selectedProduct&&selectedClient){
-      updateClientCart(selectedClient,{...selectedProduct,amount:amountSelectedProduct})
+  function addProdcutToCart(product:Product){
+    if(product&&selectedClient){
+      updateClientCart(selectedClient,{...product,amount:amountSelectedProduct})
       setAmountSelectedProduct(1)
-      Alert.alert("Carrinho","produto "+selectedProduct?.description+"adicionado ao carrinho")
-      setVisible(false)
+      Alert.alert("Carrinho","produto "+product?.description+"adicionado ao carrinho")
+      setAmountFormVisible(false)
     }
     else
       Alert.alert("Produto não selecinado","Selecione ao menos um produto")
+  }
+
+  async function save(product:Product){
+    const savedproduct= await postProduct(product)
+    addProdcutToCart(savedproduct)
+    setNewProductVisible(false)
   }
 
   return (
@@ -81,33 +90,37 @@ export default function selectSaleProducts() {
           })}
         renderItem={({item}) =>
           <View key={item.id} style={styles.products}>
-            <View style={styles.viewText}>
-                <Text onPress={()=>{
+            <Pressable onPress={()=>{
                   setSelectedProduct(item)
-                  setVisible(true)
-                  }} style={styles.itemText}>{item.description}</Text>
-                <Text onPress={()=>{
-                setSelectedProduct(item)
-                setVisible(true)
-                }} style={styles.amountText}>Estoque:{item.amount}</Text>
-            </View>
+                  setAmountFormVisible(true)
+                  }} style={styles.viewText}
+            >
+                <Text  style={styles.itemText}>{item.description}</Text>
+                <Text style={styles.amountText}>Estoque:{item.amount}</Text>
+            </Pressable>
             <View>
             </View>   
           </View>}
       /> 
-      <Modal visible={visible} animationType='slide' transparent={true}>
-          <Pressable onPress={()=>cancelAndCloseModal()} style={styles.backArea}>
-          </Pressable>
+      <Button title="novo produto" onPress={()=>setNewProductVisible(true)}/>
+      <Modal visible={newProductVisible} transparent={true}>
+        <Pressable onPress={()=>setNewProductVisible(false)} style={styles.backArea}/>
+        <ProductForm getFormData={save} submitButtonText='salvar'/>
+      </Modal>
+      <Modal visible={amountFormVisible} animationType='slide' transparent={true}>
+          <Pressable onPress={()=>cancelAndCloseModal()} style={styles.backArea}/>
             <View style={styles.amountData}>
-              <Button onPress={()=>amountSelectedProduct > 1?setAmountSelectedProduct((prev)=>prev-1):setAmountSelectedProduct(1)} title='-'/>
-                <Text >{amountSelectedProduct}</Text>
-              <Button onPress={()=>{
-                if(selectedProduct)
-                  amountSelectedProduct<selectedProduct.amount?setAmountSelectedProduct((prev)=>prev+1):selectedProduct.amount}}
-                      title='+'/>
+              <Pressable style={styles.changeAmountButton} onPress={()=>amountSelectedProduct > 1?setAmountSelectedProduct((prev)=>prev-1):setAmountSelectedProduct(1)}>
+                <Text style={styles.changeAmountButtonText}>-</Text>
+              </Pressable>
+                <Text style={styles.changeAmountButtonText}>{amountSelectedProduct}</Text>
+              <Pressable style={styles.changeAmountButton} onPress={()=>{setAmountSelectedProduct((prev)=>prev+1)}}>
+                <Text>+</Text>
+              </Pressable>
             </View>
-            <Button title='adicionar no carrinho' onPress={()=>addProdcutToCart()}></Button>
-           
+            <Button title='adicionar no carrinho' onPress={()=>{
+              if(selectedProduct)
+                addProdcutToCart(selectedProduct)}}/>
       </Modal> 
     </View>
   );
@@ -163,6 +176,12 @@ const styles = StyleSheet.create({
     alignItems:"center",
     justifyContent:"center",
     height:"50%",
-    width:"80%"
+    width:"100%"
+  },
+  changeAmountButton:{
+
+  },
+  changeAmountButtonText:{
+
   }
 })
