@@ -1,42 +1,38 @@
 
 import {router, useLocalSearchParams } from 'expo-router';
 import { useContext} from 'react';
-import GlobalAppContext from '@/context/globalAppContext';
-import {url} from "./index"
+import GlobalAppContext from '@/contexts/globalAppContext';
 import Client from '@/models/Client';
 import ClientForm from '@/components/ClientForm';
+import { Toast } from "toastify-react-native";
+import { updateClient } from '@/backednAPIRequests/clientRequests';
 
-
+const showToasts = () => {
+  Toast.success(`Cliente atualizado!`);
+};
 
 export default function editClient() {
  const {refreshClientListNow}=useContext(GlobalAppContext)
  console.log(useLocalSearchParams().phone)
  const {id}=useLocalSearchParams()
 
-  function save({name,phone}:Client){
-    fetch(url+"/"+id,{
-      method:"patch",
-      body: JSON.stringify({
-        name,
-        phone
-      }),
-      headers:{
-        'Content-Type':"application/json"
-      }
-    })
-    .then(()=>{
-      refreshClientListNow()
-      router.back()
-    }
-    )
-   }
+ if(typeof id==="string"){
+  var idNumber=parseInt(id)
+ }
+
+ async function update(client:Client){
+    await updateClient({id:idNumber,...client})
+    refreshClientListNow()
+    showToasts()
+    router.back()
+ }
 
   const isPresented = router.canGoBack();
   
 
   return (
     <ClientForm 
-    getFormData={save} 
+    getFormData={update} 
     submitButtonText='atualizar' 
     defValues={{...useLocalSearchParams()}}/>
   );

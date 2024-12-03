@@ -1,10 +1,11 @@
 import { Link, router, useLocalSearchParams} from "expo-router";
 import { View, Text, Button, StyleSheet, Alert} from "react-native";
-import GlobalAppContext from "@/context/globalAppContext";
+import GlobalAppContext from "@/contexts/globalAppContext";
 import { useContext, useEffect, useState } from "react";
 import Client from "@/models/Client";
 import {url} from "./index"
 import ClientDetails from "@/components/ClientDetails";
+import  ToastManager from "toastify-react-native";
 
 const confirmRemoveAlert = async (client:Client)=>{
 
@@ -48,14 +49,12 @@ export default function clientDetails(){
           }
           )
           .catch((error)=>console.log(error))
-    
-        }       
+         }       
       }
    
-    
-
     return(
         <View style={styles.container}>
+          <ToastManager duration={2000}/>
             <ClientDetails clientData={clientDetails}/>
             <View style={styles.actionBar}>
                 <Button onPress={ 

@@ -2,7 +2,7 @@ import { Link, router } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, Alert, Button} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useEffect, useState, useContext } from 'react';
-import GlobalAppContext from '@/context/globalAppContext';
+import GlobalAppContext from '@/contexts/globalAppContext';
 import { SearchBar } from '@rneui/themed';
 import Sale from '@/models/Sale';
 import Client from '@/models/Client';

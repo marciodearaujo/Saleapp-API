@@ -2,10 +2,11 @@ import { Link, router } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, Text, FlatList, TextInput, Button } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons'
-import GlobalAppContext from '@/context/globalAppContext';
+import GlobalAppContext from '@/contexts/globalAppContext';
 import { Alert } from 'react-native';
 import { SearchBar } from '@rneui/themed';
 import Product from "@/models/Product"
+import { getProducts } from '@/backednAPIRequests/productRequests';
 
 
 
@@ -28,32 +29,23 @@ const confirmRemoveAlert = (product:Product)=>{
 export default function productsScreenList() {
 
   const {refreshProductList,refreshProductListNow}=useContext(GlobalAppContext)
-  const [itens,setItens]= useState<Product[]>([])
+  const [products,setProducts]= useState<Product[]>([])
   const[search,setSearch]=useState("")
 
-  const filteredItens=itens.filter((product)=>product.description.includes(search)|| product.description.toLowerCase().includes(search))
+  const filteredItens=products.filter((product)=>product.description.includes(search)|| product.description.toLowerCase().includes(search))
   
   useEffect(()=>{
     getProducts()
     setSearch("")
   },[refreshProductList])
 
-  function getProducts(){
-    fetch(url,{
-      method:"get"
-    })
-    .then((response)=>{
-      return response.json()
-    }
-    )
-    .then((data)=>{
-      setItens(data)
-    })
-    .catch((error)=>console.log(error))
+  async function setList(){
+    const products= await getProducts()
+    setProducts(products)
   }
 
   function registerProduct(){
-    router.navigate("/(tabs)/products/productRegisterForm")
+    router.navigate("/(tabs)/products/registerProduct")
   }
 
   async function removeProduct(product:Product){
@@ -95,7 +87,7 @@ export default function productsScreenList() {
         <View  key={item.id} style={styles.itens}>
           <View style={styles.viewText}>
             <Link href={{
-              pathname:"/(tabs)/products/productDetails",
+              pathname:"/(tabs)/products/describeProduct",
               params:{
                 id:item.id,
                 description:item.description,
@@ -110,7 +102,7 @@ export default function productsScreenList() {
           </View>
           <View style={styles.icons}>
           <Link href={{
-              pathname:"/(tabs)/products/productEditForm",
+              pathname:"/(tabs)/products/editProduct",
               params:{
                 id:item.id,
                 description:item.description,

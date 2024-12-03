@@ -2,9 +2,11 @@ import { Link, router } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, Alert, Button} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useEffect, useState, useContext } from 'react';
-import GlobalAppContext from '@/context/globalAppContext';
+import GlobalAppContext from '@/contexts/globalAppContext';
 import { SearchBar } from '@rneui/themed';
 import Client from '@/models/Client';
+import { getClients } from '@/backednAPIRequests/clientRequests';
+import  ToastManager from "toastify-react-native";
 
 //This variable define basic url to clients resources
 export const  url="http://34.232.74.209:3001/clients"
@@ -25,30 +27,21 @@ const confirmRemoveAlert = (client:Client)=>{
 export default function clientsScreenList() {
   const {refreshClientList,refreshClientListNow}=useContext(GlobalAppContext)
   
-  const[itens,setItens]=useState<Array<Client>>([])
+  const[clients,setClients]=useState<Array<Client>>([])
   const[search,setSearch]=useState('')
 
-  const filteredItens=itens.filter((client)=>client.name.includes(search)||client.name.toLowerCase().includes(search))
+  const filteredItens=clients.filter((client)=>client.name.includes(search)||client.name.toLowerCase().includes(search))
 
   useEffect(()=>{
-    getClients()
+    setList()
     setSearch("")
   },[refreshClientList])
 
-  
-  function getClients(){
-    fetch(url,{
-      method:"get"
-    })
-    .then((response)=>{
-      return response.json()
-    }
-    )
-    .then((data)=>{
-      setItens(data)
-    })
-    .catch((error)=>console.log(error))
+  async function setList(){
+      const clients=await getClients()
+      setClients(clients)
   }
+
 
   async function removeClient(client:Client){
     if(await confirmRemoveAlert(client)){
@@ -70,6 +63,7 @@ export default function clientsScreenList() {
 
   return (
     <View style={styles.container}>
+      <ToastManager duration={2000}/>
       <SearchBar
         platform="android"
         placeholder="Buscar..."

@@ -1,6 +1,6 @@
 
 import { Stack } from 'expo-router';
-import { ShoppingCartProvider } from '@/context/shoppingCartContext';
+import { ShoppingCartProvider } from '@/contexts/shoppingCartContext';
 
 
 

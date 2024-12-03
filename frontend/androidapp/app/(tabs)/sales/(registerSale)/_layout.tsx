@@ -2,8 +2,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router, Stack, useLocalSearchParams} from 'expo-router';
 import { View, Text } from 'react-native';
-import { ShoppingCartProvider } from '@/context/shoppingCartContext';
-import ShoppingCartContext from '@/context/shoppingCartContext';
+import { ShoppingCartProvider } from '@/contexts/shoppingCartContext';
+import ShoppingCartContext from '@/contexts/shoppingCartContext';
 import { useContext } from 'react';
 
 

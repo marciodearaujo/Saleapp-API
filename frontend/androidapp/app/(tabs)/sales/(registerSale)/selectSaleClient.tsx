@@ -1,19 +1,23 @@
 import { Link, router } from 'expo-router';
-import { View, Text, StyleSheet, FlatList, Alert, Button, Pressable} from 'react-native';
+import { View, Text, StyleSheet, FlatList, Alert, Button,Modal, Pressable} from 'react-native';
 import { useEffect, useState, useContext } from 'react';
-import GlobalAppContext from '@/context/globalAppContext';
+import GlobalAppContext from '@/contexts/globalAppContext';
 import { SearchBar } from '@rneui/themed';
 import {url} from "@/app/(tabs)/clients/index"
 import Client from "@/models/Client"
-import ShoppingCartContext from '@/context/shoppingCartContext';
+import ShoppingCartContext from '@/contexts/shoppingCartContext';
+import ClientForm from '@/components/ClientForm';
+import { postClient } from '@/backednAPIRequests/clientRequests';
+
 
 
   
 export default function saleSelectClient() {
-  const {refreshClientList}=useContext(GlobalAppContext)
+  const {refreshClientList,refreshClientListNow}=useContext(GlobalAppContext)
   const {setSelectedClient}=useContext(ShoppingCartContext)
   const[clients,setClients]=useState<Array<Client>>([])
   const[search,setSearch]=useState('')
+  const [isVisible,setIsVisible]= useState(false)
 
   const filteredItens=clients.filter((client)=>client.name.includes(search)||client.name.toLowerCase().includes(search))
 
@@ -46,6 +50,13 @@ export default function saleSelectClient() {
     router.navigate("./selectSaleProducts")
   }
 
+  async function save(client:Client){
+    const savedClient=await postClient(client)
+    refreshClientListNow()
+    setSelectedClient(savedClient)
+    router.navigate("/(tabs)/sales/(registerSale)/selectSaleProducts")
+  }
+
   return (
     <View style={styles.container}>  
       <SearchBar
@@ -74,7 +85,11 @@ export default function saleSelectClient() {
             </View>   
           </View>}
       />
-       <Button title="Novo Cliente"/>
+       <Button title="Novo Cliente" onPress={()=>setIsVisible(true)}/>
+       <Modal visible={isVisible} transparent={true}>
+        <Pressable style={{backgroundColor:"rgba(24,24,24,0.6)", height:"50%"}} onPress={()=>setIsVisible(false)}></Pressable>
+        <ClientForm getFormData={save} submitButtonText='salvar'/>
+       </Modal>
     </View>
   );
 }

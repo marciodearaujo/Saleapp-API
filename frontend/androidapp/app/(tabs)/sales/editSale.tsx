@@ -6,7 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import { FieldErrors, useForm } from 'react-hook-form';
 import { useContext, useEffect, useRef, useState } from 'react';
 import formStyles from '@/styles/formStyles'
-import GlobalAppContext from '@/context/globalAppContext';
+import GlobalAppContext from '@/contexts/globalAppContext';
 import PhoneInput from '@/components/PhoneInput';
 
 

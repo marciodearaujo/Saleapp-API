@@ -1,4 +1,4 @@
-import ShoppingCartContext from "@/context/shoppingCartContext";
+import ShoppingCartContext from "@/contexts/shoppingCartContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useContext, useState } from "react";

@@ -1,9 +1,9 @@
 import {router, useLocalSearchParams} from "expo-router";
 import { View, Text, Button, StyleSheet, Alert} from "react-native";
-import GlobalAppContext from "@/context/globalAppContext";
+import GlobalAppContext from "@/contexts/globalAppContext";
 import { useContext, useEffect, useState } from "react";
-import { Product } from ".";
 import {url} from "./index"
+import Product from "@/models/Product";
 
 
 const confirmRemoveAlert = async (product:Product)=>{
@@ -63,7 +63,7 @@ export default function productDetails(){
             <View style={styles.actionBar}>
                 <Button onPress={ 
                     ()=>router.navigate({
-                    pathname:"/(tabs)/products/productEditForm",
+                    pathname:"/(tabs)/products/editProduct",
                     params:{
                         id:productDetails.id,
                         description:productDetails.description,

@@ -1,12 +1,12 @@
 import {router, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, Button, Modal, Pressable, Alert} from 'react-native';
 import { useEffect, useState, useContext } from 'react';
-import GlobalAppContext from '@/context/globalAppContext';
+import GlobalAppContext from '@/contexts/globalAppContext';
 import { SearchBar } from '@rneui/themed';
 import {url} from "@/app/(tabs)/sales/index"
 import Product from '@/models/Product';
 import {url as productUrl} from "@/app/(tabs)/products/index"
-import ShoppingCartContext from '@/context/shoppingCartContext';
+import ShoppingCartContext from '@/contexts/shoppingCartContext';
 
 export default function selectSaleProducts() {
   const {refreshProductList,refreshSaleListNow}=useContext(GlobalAppContext)

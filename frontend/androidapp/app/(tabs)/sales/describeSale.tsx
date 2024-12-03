@@ -1,6 +1,6 @@
 import { Link, router, useLocalSearchParams} from "expo-router";
 import { View, Text, Button, StyleSheet, Alert} from "react-native";
-import GlobalAppContext from "@/context/globalAppContext";
+import GlobalAppContext from "@/contexts/globalAppContext";
 import { useContext, useEffect, useState } from "react";
 import Sale from "@/models/Sale";
 import {url} from "./index"

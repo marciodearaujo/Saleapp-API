@@ -1,21 +1,19 @@
 import { View, StyleSheet, Button, Text, TextInput} from 'react-native';
-import { Link, router} from 'expo-router';
+import { Link, router,useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import {object,string} from 'yup'
+import {object,string,number, boolean} from 'yup'
 import { FieldErrors, useForm } from 'react-hook-form';
 import { useEffect, useContext, useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import formStyles from '@/styles/formStyles';
 import { CheckBox } from 'react-native-elements'
-import GlobalAppContext from '@/context/globalAppContext';
+import GlobalAppContext from '@/contexts/globalAppContext';
 import MonetaryInput from '@/components/MonetaryInput';
 import {url} from "./index"
 
-
-
-type Inputs={
-  description:string,
-  price:string,
+type Inputs = {
+  description: string,
+  price: string,
   amount?:string,
   sex:string
 }
@@ -27,36 +25,42 @@ const productSchema = object({
   sex:string().required()
 });
 
-export default function productRegisterForm() {
-  const [descriptionIsValid,setDescriptionIsValid]=useState(true)
-  const {refreshProductListNow}=useContext(GlobalAppContext)
-  const { register, setValue, handleSubmit, watch, setFocus} = useForm<Inputs>({
-          resolver: yupResolver(productSchema)})
 
-  
+
+export default function productEditForm() {
+  const [descriptionIsValid,setDescriptionIsValid]=useState(true)
+  const {id}=useLocalSearchParams()
+  const {refreshProductListNow}=useContext(GlobalAppContext)
+  const {register, setValue, handleSubmit, watch, getValues,setFocus} = useForm<Inputs>({
+          resolver: yupResolver(productSchema),
+          defaultValues:{...useLocalSearchParams()}
+        })
+
+ 
+ const initialPrice=useLocalSearchParams().price
   
   useEffect(()=>{
+    register("description")
+    register("amount")
     register('sex')
-    setValue('sex','both')
   },[])
 
-  async function handleValidData(data:Inputs){
-    fetch(url,{
-      method:"post",
+  function handleValidData(data:Inputs){
+    
+    fetch(url+"/"+id,{
+      method:"patch",
       body: JSON.stringify({
-        ...data,
+        description:data.description,
+        price:parseFloat(data.price),
         amount:data.amount?parseInt(data.amount):0,
-        price:parseFloat(data.price)
-    }),
+        sex:data.sex
+      }),
       headers:{
         'Content-Type':"application/json"
       }
     }
   )
-  .then((response)=>{
-    return response
-  }).then(data=>{
-    console.log(data)
+  .then(()=>{
     refreshProductListNow()
     router.back()
   })
@@ -92,7 +96,6 @@ export default function productRegisterForm() {
       })
 
       setFocus(errorsAlert[0].field)
-    
    }
   
   const isPresented = router.canGoBack();
@@ -102,29 +105,26 @@ export default function productRegisterForm() {
       <Text>Descrição</Text>
       <TextInput 
         {...register("description")}
-        onEndEditing={()=>setFocus("amount")}
-        enterKeyHint='next'
         autoFocus={true}
-        style={descriptionIsValid===true?formStyles.textInput:{...formStyles.textInput,borderColor:"red"}} 
         placeholder='Descrição do produto'
+        style={descriptionIsValid===true?formStyles.textInput:{...formStyles.textInput,borderColor:"red"}} 
+        value={watch("description")}
         onChangeText={(text)=>setValue("description",text)}/>
-      <Text>Quantidade</Text>
-      <TextInput
-        onEndEditing={()=>setFocus("price")}
-        {...register("amount")}
-        enterKeyHint='next'
-        keyboardType='numeric'
-        style={formStyles.textInput} 
-        placeholder='Ex: 10'
-        onChangeText={(text)=>setValue("amount",text)}/>
       <Text>Preço</Text>
       <MonetaryInput
-        enterKeyHint='enter'
         register={{...register("price")}}
         style={formStyles.textInput}
         placeholder='Ex: 9999'
+        initialValue={getValues("price")}
         onChangeText={(text)=>setValue('price',text)}
         />
+      <Text>Quantidade</Text>
+      <TextInput 
+        placeholder='Ex: 10'
+        keyboardType='numeric'
+        style={formStyles.textInput} 
+        value={watch("amount")}
+        onChangeText={(text)=>setValue("amount",text)}/>
       <Text>Sexo</Text> 
       <View style={styles.checkBoxArea}>
         <CheckBox
@@ -142,9 +142,8 @@ export default function productRegisterForm() {
           checked={watch('sex')==='male'?true:false}
           onPress={()=>setValue('sex','male')}
         />
-        
        </View>
-       <Button  title="salvar" onPress={handleSubmit(handleValidData,handleInvalidData)}></Button>
+       <Button  title="Atualizar" onPress={handleSubmit(handleValidData,handleInvalidData)}></Button>
       {!isPresented && <Link href="../">Go Back</Link>}
       <StatusBar style="light" />
     </View>
@@ -155,5 +154,5 @@ const styles=StyleSheet.create({
   checkBoxArea:{
    flexDirection:'row',
    justifyContent:'space-between',
-   marginBottom:30,
+   marginBottom:30
 }})
