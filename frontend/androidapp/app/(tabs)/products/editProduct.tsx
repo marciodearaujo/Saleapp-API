@@ -1,7 +1,7 @@
 
 import { router,useLocalSearchParams } from 'expo-router';
 import { useContext,} from 'react';
-import GlobalAppContext from '@/contexts/globalAppContext';
+import RefreshListsContext from '@/contexts/refreshListsContext';
 import { updateProduct } from '@/backednAPIRequests/productRequests';
 import Product from '@/models/Product';
 import ProductForm from '@/components/ProductForm';
@@ -11,7 +11,7 @@ import ProductForm from '@/components/ProductForm';
 
 export default function productEditForm() {
   const selectedProduct=useLocalSearchParams()
-  const {refreshProductListNow}=useContext(GlobalAppContext)
+  const {refreshProductListNow}=useContext(RefreshListsContext)
   
  
  const initialPrice=useLocalSearchParams().price

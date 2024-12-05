@@ -1,56 +1,69 @@
 import ShoppingCartContext from "@/contexts/shoppingCartContext";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useContext, useState } from "react";
 import { View, Text, FlatList, StyleSheet, Button } from "react-native";
 import { SearchBar } from '@rneui/themed';
 import Product from "@/models/Product";
-import {url} from "../index"
-import Item from "@/models/Item";
+import { postSale } from "@/backednAPIRequests/saleRequests";
+import Client from "@/models/Client";
+import { Toast } from "toastify-react-native";
+import RefreshListsContext from "@/contexts/refreshListsContext";
 
-interface SaleJsonInput{
-  saleDate:string,
-  clientId:number,
-  products:Item[]
-}
+const showToasts = (client:Client) => {
+  Toast.success(`Registrada venda para o cliente ${client.name}`);
+};
 
-  export default function confirmSaleInformation(){
-    const {cartClients,selectedClient}=useContext(ShoppingCartContext)
+  export default function ShoppingCartScreen(){
+    const {clientsCart,selectedClient,setSelectedClient,setClientsCart}=useContext(ShoppingCartContext)
+    const {refreshSaleListNow}=useContext(RefreshListsContext)
     const[search,setSearch]=useState("")
 
-    const filteredItens=getClientCartProducts().products.filter((product)=>product.description.includes(search)|| product.description.toLowerCase().includes(search))
+    const filteredItens=getSelectedClientCart().products.filter((product)=>product.description.includes(search)|| product.description.toLowerCase().includes(search))
 
-    function getClientCartProducts(){
-      let amount=0
-      if(selectedClient)
-        return cartClients.filter((cart)=>cart.client.id===selectedClient.id)[0]
-      else
+    function getSelectedClientCart(){
+      if(selectedClient){
+        return clientsCart.filter((cart)=>cart.client.id===selectedClient.id)[0]
+      }
+      else{
         return {
-         client:null,
+         client:{
+          name:"",
+          phone:""
+         },
         products:[]}
+      }
     }
 
     function updateSearch(text:string){
       setSearch(text)
     }
 
-    function removeProduct(item:Product){
-      
+    function removeProductOfCart(product:Product){
+      const selectedClientCart=getSelectedClientCart()
+      setClientsCart(prev=>{
+        if(selectedClient){
+          const cartsWhithoutSelectedClientCart=prev.filter((cart)=>cart.client.id!==selectedClient.id)
+          return [
+            ...cartsWhithoutSelectedClientCart,
+            {
+              client:selectedClient,
+              products:selectedClientCart.products.filter(prod=>prod.id!==product.id)
+            }]
+        }  
+        return prev 
+      })
     }
 
-    function save(){
-      fetch(url+"/items",{
-        method:"post",
-        body: JSON.stringify({
-          saleDate:new Date().toISOString(),
-          clientId:selectedClient?.id,
-          products:getClientCartProducts().products
-        }),
-        headers:{
-          'Content-Type':"application/json"
-        }
-      })
-
+    async function save(){
+      if(selectedClient && selectedClient.id){
+        await postSale(selectedClient.id,getSelectedClientCart().products)
+        refreshSaleListNow()
+        showToasts(selectedClient)
+        setSelectedClient(null)
+        setClientsCart([])
+        router.navigate("/(tabs)/sales")
+      }
     }
 
     return(
@@ -73,7 +86,7 @@ interface SaleJsonInput{
       <View  key={item.id} style={styles.itens}>
         <View style={styles.viewText}>
           <Link href={{
-            pathname:"/(tabs)/products/productDetails",
+            pathname:"/(tabs)/products/describeProduct",
             params:{
               id:item.id,
               description:item.description,
@@ -84,20 +97,12 @@ interface SaleJsonInput{
           }}>
             <Text style={styles.itemText}>{item.description}</Text>
           </Link>
-          
+          <View>
+            <Text>{item.amount}</Text>
+          </View>  
         </View>
         <View style={styles.icons}>
-        <Link href={{
-            pathname:"/(tabs)/products/productEditForm",
-            params:{
-              id:item.id,
-              description:item.description,
-              price:item.price,
-              amount:item.amount,
-              sex:item.sex
-            }
-          }}><Ionicons name="pencil" size={24} color="black" /></Link>
-          <Ionicons onPress={()=>removeProduct(item)} name="trash" size={24} color="black" />
+          <Ionicons onPress={()=>removeProductOfCart(item)} name="trash" size={24} color="black" />
         </View>
         
       </View>}
@@ -140,11 +145,14 @@ interface SaleJsonInput{
   icons:{
     flex:1,
     flexDirection:'row',
-    justifyContent:'space-around',
+    justifyContent:'flex-end',
     alignSelf:'flex-end',
-    width:"40%"
+    width:"20%"
   },
   viewText:{
-    width:"60%"
+    width:"80%",
+    flex:1,
+    flexDirection:"row",
+    justifyContent:"space-between"
   }
   });

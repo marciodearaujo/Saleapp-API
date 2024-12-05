@@ -2,11 +2,14 @@ import { Link, router } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, Alert, Button} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useEffect, useState, useContext } from 'react';
-import GlobalAppContext from '@/contexts/globalAppContext';
+import RefreshListsContext from '@/contexts/refreshListsContext';
 import { SearchBar } from '@rneui/themed';
 import Sale from '@/models/Sale';
 import Client from '@/models/Client';
 import {url as clientUrl} from "@/app/(tabs)/clients/index"
+import ToastManager from 'toastify-react-native';
+import SaleClient from '@/models/SaleClient';
+import { getSaleClient } from '@/backednAPIRequests/saleRequests';
 
 
 
@@ -26,48 +29,35 @@ const confirmRemoveAlert = ()=>{
   })
 }
 
-interface SaleClient{
-  id:number,
-  saleDate:string,
-  clientId:number,
-  client:Client
-}
 
-  
 export default function salesScreenList() {
-  const {refreshSaleList,refreshClientList,refreshSaleListNow}=useContext(GlobalAppContext)
+  const {refreshSaleList,refreshClientList,refreshSaleListNow}=useContext(RefreshListsContext)
   const[salesClient,setSalesClient]=useState<Array<SaleClient>>([])
   const[search,setSearch]=useState('')
 
-  const filteredSales=salesClient.filter((sale)=>sale.saleDate.includes(search)||sale.saleDate.toLowerCase().includes(search))
+  const filteredSales=salesClient.filter((sale)=>new Date(sale.saleDate).toLocaleDateString("pt-br").includes(search)||
+                                          sale.client.name.includes(search)||
+                                          sale.client.name.toLowerCase().includes(search))
+                            
 
   useEffect(()=>{
-    getSalesClient()
+    setSalesClientList()
     setSearch("")
   },[refreshSaleList])
 
   useEffect(()=>{
-    getSalesClient()
+    setSalesClientList()
   },[refreshClientList])
 
   
-  function getSalesClient(){
-    fetch(url+"?filter[include][]=client",{
-      method:"get"
-    })
-    .then((response)=>{
-      return response.json()
-    }
-    )
-    .then((data)=>{
-      setSalesClient(data)
-    })
-    .catch((error)=>console.log(error))
+  async function setSalesClientList(){
+    const saleClient= await getSaleClient()
+    setSalesClient(saleClient)
   }
 
 
 
-  async function removesale(saleClient:SaleClient){
+  async function removeSale(saleClient:SaleClient){
     if(await confirmRemoveAlert()){
       fetch(url+"/"+saleClient.id,{
         method:"delete"
@@ -87,6 +77,7 @@ export default function salesScreenList() {
 
   return (
     <View style={styles.container}>
+      <ToastManager duration={2000}/>
       <SearchBar
         platform="android"
         placeholder="Buscar..."
@@ -117,26 +108,14 @@ export default function salesScreenList() {
               } 
               }>
                 <View style={styles.item}>
-                  <Text style={styles.clientText}>{item.client.name}</Text>
-                  <Text style={styles.dateText}>Data: {new Date(item.saleDate).toLocaleDateString("pt-br")}</Text>    
+                  <Text style={styles.dateText}>Data: {new Date(item.saleDate).toLocaleDateString("pt-br")}</Text> 
+                  <Text style={styles.clientText}>{item.client.name}</Text>   
                 </View>
                 
               </Link>
             </View>
             <View style={styles.icons}>
-              <Link href={
-                {
-                  pathname:"/(tabs)/sales/editSale",
-                  params:{
-                    id:item.id,
-                    saleDate:item.saleDate,
-                    clientName:item.client.name
-                  }
-              }}   
-              >
-                <Ionicons name="pencil" size={24} color="black" />
-              </Link>
-              <Ionicons onPress={()=>removesale(item)} name="trash" size={24} color="black" />
+              <Ionicons onPress={()=>removeSale(item)} name="trash" size={24} color="black" />
             </View>    
       </View>}}
       />
@@ -183,11 +162,11 @@ item:{
   width:"60%"
 },
 clientText:{
-  fontSize:20,
-  fontWeight:"bold"
+  fontSize:15,
 },
 dateText:{
-  fontSize:15,
+  fontSize:20,
+  fontWeight:"bold"
 },
 icons:{
   flex:1,

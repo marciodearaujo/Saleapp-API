@@ -1,7 +1,7 @@
 
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { router, Stack, useLocalSearchParams} from 'expo-router';
-import { View, Text } from 'react-native';
+import { router, Stack} from 'expo-router';
+import { View, Text} from 'react-native';
 import { ShoppingCartProvider } from '@/contexts/shoppingCartContext';
 import ShoppingCartContext from '@/contexts/shoppingCartContext';
 import { useContext } from 'react';
@@ -9,22 +9,22 @@ import { useContext } from 'react';
 
 
 
-export default function ProductsPLayout() {
-  const {cartClients,selectedClient}=useContext(ShoppingCartContext)
+export default function SalesPLayout() {
+  const {clientsCart,selectedClient}=useContext(ShoppingCartContext)
 
  
   function showAmountCLientCart(){
     let amount=0
     if(selectedClient){
-      const selClientCart=cartClients.filter((cart)=>cart.client.id===selectedClient.id)[0]
-      if(selClientCart){
-        amount =selClientCart.products?selClientCart.products.length:0
-      }
+      const selClientCart=clientsCart.filter((cart)=>cart.client.id===selectedClient.id)[0]
+      if(selClientCart)
+        amount = selClientCart.products.reduce((amount,current)=>amount+current.amount,0)
     }    
     return amount
   }
 
   return (
+    
       <Stack>
         <Stack.Screen 
           name="selectSaleClient"
@@ -43,7 +43,7 @@ export default function ProductsPLayout() {
               {
               headerShown:true,
               title:`Cliente: ${selectedClient?selectedClient.name:""}`,
-              headerRight:()=><View><Ionicons onPress={()=>router.navigate("./shoppingCart")} name="cart" size={24} color="black" /><Text>{showAmountCLientCart()}</Text></View>,
+              headerRight:()=><View><Ionicons style={showAmountCLientCart()>0?{color:"green"}:{color:"black"}} onPress={()=>router.navigate("./shoppingCart")} name="cart" size={35} color="black" /><Text>{showAmountCLientCart()}</Text></View>,
               presentation:"modal",
               animation:"slide_from_bottom"
               }
@@ -60,11 +60,11 @@ export default function ProductsPLayout() {
               }
         />
         <Stack.Screen 
-          name="showShoppingCart"
+          name="shoppingCart"
           options={
               {
               headerShown:true,
-              title:`Cliente: ${selectedClient?selectedClient.name:""}`,
+              title:`Carrinho do cliente: ${selectedClient?selectedClient.name:""}`,
               presentation:"modal",
               animation:"slide_from_bottom"
               }
@@ -73,3 +73,4 @@ export default function ProductsPLayout() {
       </Stack>
   );
 }
+

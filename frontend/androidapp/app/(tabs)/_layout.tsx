@@ -1,6 +1,6 @@
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Tabs } from 'expo-router';
-import {GlobalAppProvider} from '@/contexts/globalAppContext';
+import {GlobalAppProvider} from '@/contexts/refreshListsContext';
 
 
 

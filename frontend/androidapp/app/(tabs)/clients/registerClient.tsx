@@ -2,7 +2,7 @@
 import { router} from 'expo-router';
 import {object, string} from 'yup'
 import { useContext} from 'react';
-import GlobalAppContext from '@/contexts/globalAppContext';
+import GlobalAppContext from '@/contexts/refreshListsContext';
 import ClientForm from "@/components/ClientForm"
 import Client from '@/models/Client';
 import { postClient } from '@/backednAPIRequests/clientRequests';

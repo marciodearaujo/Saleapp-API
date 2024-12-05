@@ -1,6 +1,6 @@
 import {router, useLocalSearchParams} from "expo-router";
-import { View, Text, Button, StyleSheet, Alert} from "react-native";
-import GlobalAppContext from "@/contexts/globalAppContext";
+import { View,Button, StyleSheet, Alert} from "react-native";
+import RefreshListsContext from "@/contexts/refreshListsContext";
 import { useContext, useEffect, useState } from "react";
 import {url} from "./index"
 import Product from "@/models/Product";
@@ -23,7 +23,7 @@ const confirmRemoveAlert = async (product:Product)=>{
 
 
 export default function productDetails(){
-    const {refreshProductList,refreshProductListNow}=useContext(GlobalAppContext)
+    const {refreshProductList,refreshProductListNow}=useContext(RefreshListsContext)
     const selectedProduct=useLocalSearchParams()
     const [productDetails,setproductDetails]=useState<Product>(selectedProduct as unknown as Product)
 

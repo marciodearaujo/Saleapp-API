@@ -15,7 +15,8 @@ export default function roductsPLayout() {
           name="index"
           options={
               {
-              headerShown:false,
+              headerShown:true,
+              title:"Lista de vendas",
               presentation:"modal",
               animation:"slide_from_bottom"
               }

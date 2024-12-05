@@ -1,6 +1,6 @@
-import { Link, router, useLocalSearchParams} from "expo-router";
-import { View, Text, Button, StyleSheet, Alert} from "react-native";
-import GlobalAppContext from "@/contexts/globalAppContext";
+import { router, useLocalSearchParams} from "expo-router";
+import { View, Button, StyleSheet, Alert} from "react-native";
+import RefreshListsContext from "@/contexts/refreshListsContext";
 import { useContext, useEffect, useState } from "react";
 import Client from "@/models/Client";
 import {url} from "./index"
@@ -23,7 +23,7 @@ const confirmRemoveAlert = async (client:Client)=>{
 
 
 export default function clientDetails(){
-    const {refreshClientList,refreshClientListNow}=useContext(GlobalAppContext)
+    const {refreshClientList,refreshClientListNow}=useContext(RefreshListsContext)
     const selectedClient=useLocalSearchParams()
     const [clientDetails,setClientDetails]=useState<Client>(selectedClient as unknown as Client)
     

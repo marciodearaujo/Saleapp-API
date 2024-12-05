@@ -9,7 +9,7 @@ import { useEffect, useContext, useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import formStyles from '@/styles/formStyles';
 import { CheckBox } from 'react-native-elements'
-import GlobalAppContext from '@/contexts/globalAppContext';
+import GlobalAppContext from '@/contexts/refreshListsContext';
 import MonetaryInput from '@/components/MonetaryInput';
 import Product from '@/models/Product';
 

@@ -1,8 +1,7 @@
-import { Link, router, useLocalSearchParams} from "expo-router";
-import { View, Text, Button, StyleSheet, Alert} from "react-native";
-import GlobalAppContext from "@/contexts/globalAppContext";
+import { router, useLocalSearchParams} from "expo-router";
+import { View, Button, StyleSheet, Alert} from "react-native";
+import RefreshListsContext from "@/contexts/refreshListsContext";
 import { useContext, useEffect, useState } from "react";
-import Sale from "@/models/Sale";
 import {url} from "./index"
 import {url as productUrl} from "../products/index"
 import SaleDetails from "@/components/SaleDetails"
@@ -24,7 +23,7 @@ const confirmRemoveAlert = async ()=>{
 
 
 export default function DescribeSale(){
-    const {refreshSaleList,refreshProductList,refreshSaleListNow}=useContext(GlobalAppContext)
+    const {refreshSaleList,refreshProductList,refreshSaleListNow}=useContext(RefreshListsContext)
     const [saleItems,setSaleItems]=useState<Array<Item>>([])
     const [products,setProducts]=useState<Array<Product>>([])
 

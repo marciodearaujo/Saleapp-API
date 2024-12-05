@@ -2,7 +2,7 @@ import { Link, router } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, Alert, Button} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useEffect, useState, useContext } from 'react';
-import GlobalAppContext from '@/contexts/globalAppContext';
+import RefreshListsContext from '@/contexts/refreshListsContext';
 import { SearchBar } from '@rneui/themed';
 import Client from '@/models/Client';
 import { getClients } from '@/backednAPIRequests/clientRequests';
@@ -26,7 +26,7 @@ const confirmRemoveAlert = (client:Client)=>{
 
   
 export default function clientsScreenList() {
-  const {refreshClientList,refreshClientListNow}=useContext(GlobalAppContext)
+  const {refreshClientList,refreshClientListNow}=useContext(RefreshListsContext)
   
   const[clients,setClients]=useState<Array<Client>>([])
   const[search,setSearch]=useState('')

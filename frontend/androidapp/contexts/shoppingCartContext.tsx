@@ -4,13 +4,15 @@ import  {useState,createContext, ReactNode} from 'react'
 
 
 interface ShoppingCartContextInterface{
-   cartClients:Cart[],
+   clientsCart:Cart[],
+   setClientsCart:React.Dispatch<React.SetStateAction<Cart[]>>
    updateClientCart:(client:Client,product:Product)=>void,
    selectedClient:Client | null,
    setSelectedClient:React.Dispatch<React.SetStateAction<Client | null>>
+   createSelectedClientCart:(client:Client)=>void
 }
 
-interface Cart{
+export interface Cart{
   client:Client,
   products:Product[]
 }
@@ -22,17 +24,11 @@ type props = {
 const ShoppingCartContext=createContext<ShoppingCartContextInterface>({} as ShoppingCartContextInterface)
 
 export function ShoppingCartProvider({children}:props){
-    // const [refreshCart,setRefreshCart]=useState(false)
-    const [cartClients,setCartClients]=useState<Cart[]>([])
+    const [clientsCart,setClientsCart]=useState<Cart[]>([])
     const [selectedClient, setSelectedClient]= useState<Client | null>(null)
     
-    
-    function refreshCartNow(){
-      //setRefreshCart(prev=>!prev)
-    }
-    
   function updateClientCart(client:Client,product:Product){
-      setCartClients(prev=>{
+      setClientsCart(prev=>{
         if(prev.length!==0){
           const index =prev.findIndex(cart=>cart.client.id===client.id)
           if(index!==-1){
@@ -50,11 +46,24 @@ export function ShoppingCartProvider({children}:props){
             products:[product]
           }]
       })
-      //refreshCartNow()
+
+  }
+
+  function createSelectedClientCart(client:Client){
+    setSelectedClient(client)
+    setClientsCart(prev=>{
+      return [
+        ...prev,
+        {
+        client,
+        products:[]
+        }
+      ]
+    })
   }
     
   return(
-      <ShoppingCartContext.Provider value={{cartClients,updateClientCart,selectedClient,setSelectedClient}}>
+      <ShoppingCartContext.Provider value={{createSelectedClientCart,clientsCart,updateClientCart,selectedClient,setSelectedClient,setClientsCart}}>
         {children}
       </ShoppingCartContext.Provider>
     )

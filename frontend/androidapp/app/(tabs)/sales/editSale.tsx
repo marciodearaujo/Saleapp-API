@@ -4,9 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import {object, string} from 'yup'
 import { yupResolver } from "@hookform/resolvers/yup"
 import { FieldErrors, useForm } from 'react-hook-form';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import formStyles from '@/styles/formStyles'
-import GlobalAppContext from '@/contexts/globalAppContext';
+import RefreshListsContext from '@/contexts/refreshListsContext';
 import PhoneInput from '@/components/PhoneInput';
 
 
@@ -27,7 +27,7 @@ export default function saleEditForm() {
     name:true,
     phone:true
   })
-  const {refreshSaleList,refreshSaleListNow}=useContext(GlobalAppContext)
+  const {refreshSaleList,refreshSaleListNow}=useContext(RefreshListsContext)
   const { register, setValue, handleSubmit, watch, getValues, setFocus } = useForm<Inputs>({
     resolver: yupResolver(saleSchema),
     defaultValues:useLocalSearchParams<Inputs>()

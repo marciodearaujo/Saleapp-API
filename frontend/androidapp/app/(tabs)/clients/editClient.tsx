@@ -1,7 +1,7 @@
 
 import {router, useLocalSearchParams } from 'expo-router';
 import { useContext} from 'react';
-import GlobalAppContext from '@/contexts/globalAppContext';
+import RefreshListsContext from '@/contexts/refreshListsContext';
 import Client from '@/models/Client';
 import ClientForm from '@/components/ClientForm';
 import { Toast } from "toastify-react-native";
@@ -12,7 +12,7 @@ const showToasts = () => {
 };
 
 export default function editClient() {
- const {refreshClientListNow}=useContext(GlobalAppContext)
+ const {refreshClientListNow}=useContext(RefreshListsContext)
  console.log(useLocalSearchParams().phone)
  const {id}=useLocalSearchParams()
 

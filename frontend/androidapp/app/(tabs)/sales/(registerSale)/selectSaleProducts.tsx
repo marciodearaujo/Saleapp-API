@@ -1,9 +1,8 @@
 import {router, useLocalSearchParams } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, Button, Modal, Pressable, Alert} from 'react-native';
 import { useEffect, useState, useContext } from 'react';
-import GlobalAppContext from '@/contexts/globalAppContext';
+import GlobalAppContext from '@/contexts/refreshListsContext';
 import { SearchBar } from '@rneui/themed';
-import {url} from "@/app/(tabs)/sales/index"
 import Product from '@/models/Product';
 import {url as productUrl} from "@/app/(tabs)/products/index"
 import ShoppingCartContext from '@/contexts/shoppingCartContext';
@@ -56,9 +55,17 @@ export default function selectSaleProducts() {
 
   function addProdcutToCart(product:Product){
     if(product&&selectedClient){
-      updateClientCart(selectedClient,{...product,amount:amountSelectedProduct})
+      updateClientCart(selectedClient,product)
       setAmountSelectedProduct(1)
-      Alert.alert("Carrinho","produto "+product?.description+"adicionado ao carrinho")
+      Alert.alert("Carrinho","Produto "+product?.description+" adicionado ao carrinho",[
+        {
+          text: 'ir para o carrinho', onPress:()=> router.navigate("/(tabs)/sales/(registerSale)/shoppingCart")
+        },
+        {
+          text: 'adicionar mais produtos',
+          style:"cancel"
+        },
+      ])
       setAmountFormVisible(false)
     }
     else
@@ -66,8 +73,8 @@ export default function selectSaleProducts() {
   }
 
   async function save(product:Product){
-    const savedproduct= await postProduct(product)
-    addProdcutToCart(savedproduct)
+    const savedProduct= await postProduct(product)
+    addProdcutToCart(savedProduct)
     setNewProductVisible(false)
   }
 
@@ -103,24 +110,28 @@ export default function selectSaleProducts() {
           </View>}
       /> 
       <Button title="novo produto" onPress={()=>setNewProductVisible(true)}/>
-      <Modal visible={newProductVisible} transparent={true}>
+
+      {/* Modal to register a new Product during the sale register */}
+      <Modal style={styles.backArea} visible={newProductVisible} transparent={true}>
         <Pressable onPress={()=>setNewProductVisible(false)} style={styles.backArea}/>
         <ProductForm getFormData={save} submitButtonText='salvar'/>
       </Modal>
+
+      {/* Modal to define the product amaunt */}
       <Modal visible={amountFormVisible} animationType='slide' transparent={true}>
           <Pressable onPress={()=>cancelAndCloseModal()} style={styles.backArea}/>
             <View style={styles.amountData}>
               <Pressable style={styles.changeAmountButton} onPress={()=>amountSelectedProduct > 1?setAmountSelectedProduct((prev)=>prev-1):setAmountSelectedProduct(1)}>
                 <Text style={styles.changeAmountButtonText}>-</Text>
               </Pressable>
-                <Text style={styles.changeAmountButtonText}>{amountSelectedProduct}</Text>
+                <Text style={{fontSize:20,padding:20}}>{amountSelectedProduct}</Text>
               <Pressable style={styles.changeAmountButton} onPress={()=>{setAmountSelectedProduct((prev)=>prev+1)}}>
-                <Text>+</Text>
+                <Text style={styles.changeAmountButtonText}>+</Text>
               </Pressable>
             </View>
             <Button title='adicionar no carrinho' onPress={()=>{
               if(selectedProduct)
-                addProdcutToCart(selectedProduct)}}/>
+                addProdcutToCart({...selectedProduct,amount:amountSelectedProduct})}}/>
       </Modal> 
     </View>
   );
@@ -167,7 +178,7 @@ const styles = StyleSheet.create({
     width:"100%"
   },
   backArea:{
-    height:"50%",
+    height:"40%",
     backgroundColor:"rgba(24,24,24,0.6)",
   },
   amountData:{
@@ -175,13 +186,20 @@ const styles = StyleSheet.create({
     flexDirection:"row",
     alignItems:"center",
     justifyContent:"center",
-    height:"50%",
-    width:"100%"
+    height:"30%",
+    width:"100%",
+    backgroundColor:"#ddd"
   },
   changeAmountButton:{
-
+    padding:20,
+    fontSize:10,
+    borderRadius:10,
+    backgroundColor:"#1E90FF",
+    color:"#fff"
   },
   changeAmountButtonText:{
-
+    fontSize:20,
+    padding:20,
+    fontWeight:"bold"
   }
 })

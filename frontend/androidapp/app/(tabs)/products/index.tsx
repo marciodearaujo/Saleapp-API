@@ -2,7 +2,7 @@ import { Link, router } from 'expo-router';
 import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, Text, FlatList, TextInput, Button } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons'
-import GlobalAppContext from '@/contexts/globalAppContext';
+import RefreshListsContext from '@/contexts/refreshListsContext';
 import { Alert } from 'react-native';
 import { SearchBar } from '@rneui/themed';
 import Product from "@/models/Product"
@@ -29,7 +29,7 @@ const confirmRemoveAlert = (product:Product)=>{
 
 export default function productsScreenList() {
 
-  const {refreshProductList,refreshProductListNow}=useContext(GlobalAppContext)
+  const {refreshProductList,refreshProductListNow}=useContext(RefreshListsContext)
   const [products,setProducts]= useState<Product[]>([])
   const[search,setSearch]=useState("")
 

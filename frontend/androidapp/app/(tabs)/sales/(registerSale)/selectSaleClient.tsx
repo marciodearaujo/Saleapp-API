@@ -1,7 +1,7 @@
 import { Link, router } from 'expo-router';
 import { View, Text, StyleSheet, FlatList, Alert, Button,Modal, Pressable} from 'react-native';
 import { useEffect, useState, useContext } from 'react';
-import GlobalAppContext from '@/contexts/globalAppContext';
+import GlobalAppContext from '@/contexts/refreshListsContext';
 import { SearchBar } from '@rneui/themed';
 import {url} from "@/app/(tabs)/clients/index"
 import Client from "@/models/Client"
@@ -14,7 +14,7 @@ import { postClient } from '@/backednAPIRequests/clientRequests';
   
 export default function saleSelectClient() {
   const {refreshClientList,refreshClientListNow}=useContext(GlobalAppContext)
-  const {setSelectedClient}=useContext(ShoppingCartContext)
+  const {setSelectedClient,createSelectedClientCart}=useContext(ShoppingCartContext)
   const[clients,setClients]=useState<Array<Client>>([])
   const[search,setSearch]=useState('')
   const [isVisible,setIsVisible]= useState(false)
@@ -46,7 +46,7 @@ export default function saleSelectClient() {
   }
 
   function nextPage(client:Client){
-    setSelectedClient(client)
+    createSelectedClientCart(client)
     router.navigate("./selectSaleProducts")
   }
 

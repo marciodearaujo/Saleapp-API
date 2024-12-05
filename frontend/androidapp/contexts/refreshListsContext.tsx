@@ -1,7 +1,7 @@
 import  {useState,createContext, ReactNode} from 'react'
 
 
-interface GlobalAppContextInterface{
+interface RefreshListsContextInterface{
    refreshClientList:boolean
    refreshProductList:boolean
    refreshSaleList:boolean
@@ -14,7 +14,7 @@ type props = {
   children: ReactNode
 }
 
-const GlobalAppContext=createContext<GlobalAppContextInterface>({} as GlobalAppContextInterface)
+const RefreshListsContext=createContext<RefreshListsContextInterface>({} as RefreshListsContextInterface)
 
 export function GlobalAppProvider({children}:props){
     const [refreshClientList,setRefreshClientList]=useState(false)
@@ -35,10 +35,10 @@ export function GlobalAppProvider({children}:props){
 
 
     return(
-      <GlobalAppContext.Provider value={{refreshClientList,refreshProductList,refreshSaleList,refreshClientListNow,refreshProductListNow,refreshSaleListNow}}>
+      <RefreshListsContext.Provider value={{refreshClientList,refreshProductList,refreshSaleList,refreshClientListNow,refreshProductListNow,refreshSaleListNow}}>
         {children}
-      </GlobalAppContext.Provider>
+      </RefreshListsContext.Provider>
     )
   }
 
-  export default GlobalAppContext;
+  export default RefreshListsContext;
