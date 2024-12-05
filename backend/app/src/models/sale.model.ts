@@ -33,6 +33,9 @@ export class Sale extends Entity {
   @hasMany(() => Product, {through: {model: () => Item}})
   products: Product[];
 
+  @hasMany(() => Item)
+  items: Item[];
+
   constructor(data?: Partial<Sale>) {
     super(data);
   }
