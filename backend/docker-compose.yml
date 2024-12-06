@@ -19,4 +19,6 @@ services:
     environment:
         - MYSQL_ROOT_PASSWORD= #set your database root password here
     volumes:
-      - /apps/saleapp/backend/db/database:/var/lib/mysql
+      - /apps/volumes/database:/var/lib/mysql
+    ports:
+      - 3306:3306
