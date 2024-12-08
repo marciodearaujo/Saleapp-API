@@ -3,10 +3,9 @@ import { View, Button, StyleSheet, Alert} from "react-native";
 import RefreshListsContext from "@/contexts/refreshListsContext";
 import { useContext, useEffect, useState } from "react";
 import Client from "@/models/Client";
-import {url} from "./index"
 import ClientDetails from "@/components/ClientDetails";
 import  ToastManager from "toastify-react-native";
-import { findClientById } from "@/backednAPIRequests/clientRequests";
+import { findClientById, removeClientById } from "@/backednAPIRequests/clientRequests";
 
 const confirmRemoveAlert = async (client:Client)=>{
 
@@ -25,6 +24,7 @@ const confirmRemoveAlert = async (client:Client)=>{
 export default function clientDetails(){
     const {refreshClientList,refreshClientListNow}=useContext(RefreshListsContext)
     const selectedClient=useLocalSearchParams()
+    const id=useLocalSearchParams().id
     const [clientDetails,setClientDetails]=useState<Client>(selectedClient as unknown as Client)
     
 
@@ -40,20 +40,12 @@ export default function clientDetails(){
     }
     
     async function removeClient(client:Client){
-    
-        if(await confirmRemoveAlert(client)){
-          fetch(url+"/"+client.id,{
-            method:"delete"
-          })
-          .then(()=>{
-            refreshClientListNow()
-            router.back()
-          }
-          )
-          .catch((error)=>console.log(error))
-         }       
-      }
-   
+        if(await confirmRemoveAlert(client)&&client.id){
+          await removeClientById(client.id)     
+          refreshClientListNow()
+        }    
+    }
+
     return(
         <View style={styles.container}>
           <ToastManager duration={2000}/>

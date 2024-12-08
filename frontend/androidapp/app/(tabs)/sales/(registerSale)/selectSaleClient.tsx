@@ -3,11 +3,10 @@ import { View, Text, StyleSheet, FlatList, Alert, Button,Modal, Pressable} from 
 import { useEffect, useState, useContext } from 'react';
 import GlobalAppContext from '@/contexts/refreshListsContext';
 import { SearchBar } from '@rneui/themed';
-import {url} from "@/app/(tabs)/clients/index"
 import Client from "@/models/Client"
 import ShoppingCartContext from '@/contexts/shoppingCartContext';
 import ClientForm from '@/components/ClientForm';
-import { postClient } from '@/backednAPIRequests/clientRequests';
+import { getClients, postClient } from '@/backednAPIRequests/clientRequests';
 
 
 
@@ -22,23 +21,14 @@ export default function saleSelectClient() {
   const filteredItens=clients.filter((client)=>client.name.includes(search)||client.name.toLowerCase().includes(search))
 
   useEffect(()=>{
-    getClients()
+    setClientsList()
     setSearch("")
   },[refreshClientList])
 
   
-  function getClients(){
-    fetch(url,{
-      method:"get"
-    })
-    .then((response)=>{
-      return response.json()
-    }
-    )
-    .then((data)=>{
-      setClients(data)
-    })
-    .catch((error)=>console.log(error))
+  async function setClientsList(){
+    const clients= await getClients()
+    setClients(clients)
   }
 
   function updateSearch(text:string){

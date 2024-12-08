@@ -6,6 +6,7 @@ import Client from '@/models/Client';
 import ClientForm from '@/components/ClientForm';
 import { Toast } from "toastify-react-native";
 import { updateClient } from '@/backednAPIRequests/clientRequests';
+import { narrowingToString } from '@/utils/utilsFunctions';
 
 const showToasts = () => {
   Toast.success(`Cliente atualizado!`);
@@ -13,21 +14,17 @@ const showToasts = () => {
 
 export default function editClient() {
  const {refreshClientListNow}=useContext(RefreshListsContext)
- console.log(useLocalSearchParams().phone)
+ console.log(useLocalSearchParams().id)
  const {id}=useLocalSearchParams()
-
- if(typeof id==="string"){
-  var idNumber=parseInt(id)
- }
+ const clientId=narrowingToString(id)
 
  async function update(client:Client){
-    await updateClient({id:idNumber,...client})
+    await updateClient({id:parseInt(clientId),...client})
     refreshClientListNow()
     showToasts()
     router.back()
  }
 
-  const isPresented = router.canGoBack();
   
 
   return (

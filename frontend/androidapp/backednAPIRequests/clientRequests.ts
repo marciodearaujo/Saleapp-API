@@ -62,3 +62,14 @@ export async function getClients():Promise<Client[]>{
             throw error
         }   
 }
+
+export async function removeClientById(id:number){
+    try{
+        await fetch(url+"/"+id,{
+            method:"delete"
+          })
+    }catch(error){
+        console.log(error)
+        throw error
+    }
+}

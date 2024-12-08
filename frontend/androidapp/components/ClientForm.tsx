@@ -31,14 +31,11 @@ export default function ClientForm({getFormData,submitButtonText,defValues}:Prop
         defaultValues:defValues
         })
 
-        const isPresented = router.canGoBack();
-
         const nameFieldRef=useRef<TextInput>(null)
       
         nameFieldRef.current?.isFocused()
       
-         function invalidData(errors:FieldErrors<Client>){
-          console.log(errors)
+         function handleInvalidData(errors:FieldErrors<Client>){
           if(errors.name?.message && errors.phone?.message){
             alert(errors.phone?.message)
             alert(errors.name?.message)
@@ -86,8 +83,7 @@ export default function ClientForm({getFormData,submitButtonText,defValues}:Prop
             register={{...register("phone")}}
             style={fieldsValidationStatus.phone===true?formStyles.textInput:{...formStyles.textInput,borderColor:"red" }}
             onChangeText={(text)=>setValue("phone",text)}/>
-           <Button  title={submitButtonText} onPress={handleSubmit(getFormData,invalidData)}></Button>
-          {!isPresented && <Link href="../">Go Back</Link>}
+           <Button  title={submitButtonText} onPress={handleSubmit(getFormData,handleInvalidData)}></Button>
           <StatusBar style="light" />
         </View>
       );

@@ -5,6 +5,7 @@ import RefreshListsContext from '@/contexts/refreshListsContext';
 import { updateProduct } from '@/backednAPIRequests/productRequests';
 import Product from '@/models/Product';
 import ProductForm from '@/components/ProductForm';
+import { narrowingToString } from '@/utils/utilsFunctions';
 
 
 
@@ -12,14 +13,12 @@ import ProductForm from '@/components/ProductForm';
 export default function productEditForm() {
   const selectedProduct=useLocalSearchParams()
   const {refreshProductListNow}=useContext(RefreshListsContext)
-  
- 
- const initialPrice=useLocalSearchParams().price
+  const initialPrice=useLocalSearchParams().price
+  const productId=narrowingToString(selectedProduct.id)
   
 
   async function update(data:Product){
-    if(typeof selectedProduct.id==="string")
-    await updateProduct({id:parseInt(selectedProduct.id),...data})
+    await updateProduct({id:parseInt(productId),...data})
     refreshProductListNow()
     router.back()
   

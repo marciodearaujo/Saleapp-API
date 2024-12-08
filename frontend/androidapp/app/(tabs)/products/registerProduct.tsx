@@ -19,6 +19,7 @@ export default function productRegisterForm() {
  
 
   async function save(product:Product){
+    console.log(product)
     const registredProduct=await postProduct(product)
     refreshProductListNow()
     showToasts(registredProduct)

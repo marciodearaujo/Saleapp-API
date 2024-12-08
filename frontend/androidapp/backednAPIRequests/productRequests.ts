@@ -1,3 +1,4 @@
+import Item from "@/models/Item"
 import Product from "@/models/Product"
 
 const  url="http://34.232.74.209:3001/products"
@@ -14,7 +15,7 @@ export async function getProducts(){
     } 
   }
 
-  export async function removeProduct(id:number){
+  export async function removeProductById(id:number){
     try{
         fetch(url+"/"+id,{
             method:"delete"
@@ -77,3 +78,15 @@ export async function getProducts(){
         throw error
     }
   }
+
+  export async function getSaleitems(saleId:number):Promise<Item>{
+    try{
+      const response= await fetch(url+"/"+saleId+"/items",{
+        method:"get"
+      })
+      return await response.json()
+    }catch(error){
+      console.log(error)
+      throw error
+    }
+    }

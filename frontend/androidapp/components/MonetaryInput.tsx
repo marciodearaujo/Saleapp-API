@@ -8,7 +8,7 @@ import { UseFormRegisterReturn } from "react-hook-form";
 interface props  {
         register:UseFormRegisterReturn<"price">
         style:{},
-        placeholder:string,
+        placeholder?:string,
         onChangeText:(text:string)=>void
         initialValue?:string
         enterKeyHint?:EnterKeyHintTypeOptions | undefined

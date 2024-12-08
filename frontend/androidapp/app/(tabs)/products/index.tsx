@@ -6,12 +6,10 @@ import RefreshListsContext from '@/contexts/refreshListsContext';
 import { Alert } from 'react-native';
 import { SearchBar } from '@rneui/themed';
 import Product from "@/models/Product"
-import { getProducts, removeProduct } from '@/backednAPIRequests/productRequests';
+import { getProducts, removeProductById } from '@/backednAPIRequests/productRequests';
 import ToastManager from 'toastify-react-native';
 
 
-
-export const url="http://34.232.74.209:3001/products"
 
 const confirmRemoveAlert = (product:Product)=>{
 
@@ -47,7 +45,7 @@ export default function productsScreenList() {
 
   async function remove(product:Product){
     if(await confirmRemoveAlert(product) && product.id){
-        await removeProduct(product.id)
+        await removeProductById(product.id)
       refreshProductListNow()
     }       
   }
@@ -89,7 +87,7 @@ export default function productsScreenList() {
             }}>
               <Text style={styles.itemText}>{item.description}</Text>
             </Link>
-            
+            <Text>Quantidade: {item.amount}</Text>   
           </View>
           <View style={styles.icons}>
           <Link href={{
@@ -150,6 +148,8 @@ icons:{
   width:"40%"
 },
 viewText:{
-  width:"60%"
+  width:"60%",
+  flex:1,
+  flexDirection:"column"
 }
 });

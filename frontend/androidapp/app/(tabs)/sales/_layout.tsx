@@ -3,8 +3,6 @@ import { Stack } from 'expo-router';
 import { ShoppingCartProvider } from '@/contexts/shoppingCartContext';
 
 
-
-
 export default function roductsPLayout() {
 
   
@@ -29,16 +27,6 @@ export default function roductsPLayout() {
               headerShown:false,
               presentation:"modal",
               animation:"slide_from_right"
-              }
-              }
-        />
-        <Stack.Screen 
-          name="editSale"
-          options={
-              {
-              headerShown:false,
-              presentation:"modal",
-              animation:"fade"
               }
               }
         />

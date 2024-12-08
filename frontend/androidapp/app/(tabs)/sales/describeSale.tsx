@@ -1,38 +1,20 @@
 import { router, useLocalSearchParams} from "expo-router";
 import { View, Button, StyleSheet, Alert} from "react-native";
 import RefreshListsContext from "@/contexts/refreshListsContext";
-import { useContext, useEffect, useState } from "react";
-import {url} from "./index"
-import {url as productUrl} from "../products/index"
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import SaleDetails from "@/components/SaleDetails"
 import Item from "@/models/Item";
 import Product from "@/models/Product";
-
-const confirmRemoveAlert = async ()=>{
-
-    return new Promise<boolean>((resolve,reject)=>{
-      Alert.alert('Remover registro de venda', 'Deseja remover o registro de venda?', [
-        {
-          text: 'Não',
-          style: 'cancel', onPress:()=> reject(false)
-        },
-        {text: 'SIM', onPress: () =>resolve(true)},
-      ])
-    })
-  }
+import { getProducts } from "@/backednAPIRequests/productRequests";
+import { getSaleItems } from "@/backednAPIRequests/saleRequests";
+import { narrowingToString } from "@/utils/utilsFunctions";
 
 
 export default function DescribeSale(){
-    const {refreshSaleList,refreshProductList,refreshSaleListNow}=useContext(RefreshListsContext)
-    const [saleItems,setSaleItems]=useState<Array<Item>>([])
-    const [products,setProducts]=useState<Array<Product>>([])
+    const {refreshSaleList,refreshProductList}=useContext(RefreshListsContext)
+    const [saleItems,setSaleItems]=useState<Array<Item> | null>(null)
+    const [products,setProducts]=useState<Array<Product> | null>(null)
 
-    function narrowingToString(data:string|string[]){
-      if(typeof data==="string"){
-          return data
-      }
-      return data[0]
-    }
     
     const saleId=narrowingToString(useLocalSearchParams().id)
     const saleDate=narrowingToString(useLocalSearchParams().saleDate)
@@ -42,65 +24,30 @@ export default function DescribeSale(){
   
 
     useEffect(()=>{
-        getProducts()
-        getSaleItems()
+        setProductsList()
+        setSaleItemsList()
     },[refreshSaleList,refreshProductList])
 
 
-    function getProducts(){
-      fetch(productUrl,{
-        method:"get"
-      })
-      .then((response)=>{
-        return response.json()
-      }
-      )
-      .then((data)=>{
-        setProducts(data)
-        console.log("porducts ok")
-      })
-      .catch((error)=>console.log(error))
+    async function setProductsList(){
+      const products= await getProducts()
+      setProducts(products)
     }
 
 
-    function getSaleItems(){
-      fetch(url+"/"+saleId+"/items",{
-        method:"get"
-      })
-      .then((response)=>{
-        return response.json()
-      }
-      )
-      .then((data)=>{
-        setSaleItems(data)
-        console.log("items ok")
-      })
-      .catch((error)=>console.log(error))
+    async function setSaleItemsList(){
+      const saleItems= await getSaleItems(parseInt(saleId))
+      setSaleItems(saleItems)
     }
     
-    async function removeSale(saleId:string){
-    
-        if(await confirmRemoveAlert()){
-          fetch(url+"/"+saleId,{
-            method:"delete"
-          })
-          .then(()=>{
-            refreshSaleListNow()
-            router.back()
-          }
-          )
-          .catch((error)=>console.log(error))
-        }       
-      }
+  
    
-    
-
+  
     return(
         <View style={styles.container}>
             <SaleDetails saleDate={saleDate} clientName={clientName} saleItems={saleItems} products={products}/>
             <View style={styles.actionBar}>
-                <Button onPress={()=>router.navigate("/(tabs)/sales/editSale")} title="editar"/>
-                <Button onPress={()=>removeSale(saleId)}title="apagar"/>
+                <Button onPress={()=>router.back()} title="voltar"/>
             </View>    
         </View>
     )

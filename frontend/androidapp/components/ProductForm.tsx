@@ -9,7 +9,6 @@ import { useEffect, useContext, useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import formStyles from '@/styles/formStyles';
 import { CheckBox } from 'react-native-elements'
-import GlobalAppContext from '@/contexts/refreshListsContext';
 import MonetaryInput from '@/components/MonetaryInput';
 import Product from '@/models/Product';
 
@@ -17,8 +16,8 @@ import Product from '@/models/Product';
 const productSchema = object({
   id:number(),
   description: string().required("A descrição do produto deve ser informada"),
-  price: number().required("O preço do produto deve ser informado"),
-  amount:number().required(),
+  price: number(),
+  amount:number(),
   sex:string()
 });
 
@@ -29,7 +28,11 @@ interface Props{
 }
 export default function ProductForm({getFormData,submitButtonText,defValues}:Props) {
 
-  const [descriptionIsValid,setDescriptionIsValid]=useState(true)
+  // const [descriptionIsValid,setDescriptionIsValid]=useState(true)
+  const[fieldsValidationStatus,setfieldsValidationStatus]=useState({
+    description:true,
+    price:true
+  })
   const { register, setValue, handleSubmit, watch, setFocus, getValues} = useForm<Product>({
           resolver: yupResolver(productSchema),
         defaultValues:defValues})
@@ -39,38 +42,36 @@ export default function ProductForm({getFormData,submitButtonText,defValues}:Pro
   useEffect(()=>{
     register('sex')
    !getValues("sex")&&setValue('sex','both')
+   !getValues("amount")&&setValue('amount',0)
   },[])
 
  
    async function handleInvalidData(errors:FieldErrors<Product>){
-    type erro={
-      field:keyof Product,
-      message:string
-    } 
-    let errorsAlert:Array<erro>=[]
-    if(errors.description?.message){
-      errorsAlert.push({
-        field:"description",
-        message:errors.description.message
+    if(errors.description?.message && errors.price?.message){
+      alert(errors.price?.message)
+      alert(errors.description?.message)
+      setfieldsValidationStatus({
+        price:false,
+        description:false
       })
-      setDescriptionIsValid(false)
+      setFocus("description")
     }
-    if(errors.amount?.message)
-      errorsAlert.push({
-        field:"amount",
-        message:errors.amount.message
+    else if(errors.description?.message){
+      alert(errors.description?.message)
+      setfieldsValidationStatus({
+        price:true,
+        description:false
       })
-    if(errors.price?.message)
-      errorsAlert.push({
-        field:"price",
-        message:errors.price.message
+      setFocus("description")   
+    }
+    else if(errors.price?.message){
+      alert(errors.price?.message)
+      setfieldsValidationStatus({
+        description:true,
+        price:false
       })
-
-      errorsAlert.map((errors)=>{
-        alert(errors.message)
-      })
-
-      setFocus(errorsAlert[0].field)
+      setFocus("price")
+    }
     
    }
   
@@ -85,7 +86,7 @@ export default function ProductForm({getFormData,submitButtonText,defValues}:Pro
         onEndEditing={()=>setFocus("amount")}
         enterKeyHint='next'
         autoFocus={true}
-        style={descriptionIsValid===true?formStyles.textInput:{...formStyles.textInput,borderColor:"red"}} 
+        style={fieldsValidationStatus.description===true?formStyles.textInput:{...formStyles.textInput,borderColor:"red"}} 
         placeholder='Descrição do produto'
         onChangeText={(text)=>setValue("description",text)}/>
       <Text>Quantidade</Text>
@@ -96,15 +97,13 @@ export default function ProductForm({getFormData,submitButtonText,defValues}:Pro
         enterKeyHint='next'
         keyboardType='numeric'
         style={formStyles.textInput} 
-        placeholder='Ex: 10'
         onChangeText={(text)=>setValue("amount",parseInt(text))}/>
       <Text>Preço (unidade)</Text>
       <MonetaryInput
         initialValue={getValues("price")?.toString()}
         enterKeyHint='enter'
         register={{...register("price")}}
-        style={formStyles.textInput}
-        placeholder='Ex: 9999'
+        style={formStyles.textInput} 
         onChangeText={(text)=>setValue('price',parseInt(text))}
         />
       <Text>Sexo</Text> 

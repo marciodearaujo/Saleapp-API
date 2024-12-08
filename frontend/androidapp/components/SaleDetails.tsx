@@ -6,29 +6,33 @@ import {View, Text, StyleSheet, FlatList } from "react-native"
 interface props{
     saleDate:string,
     clientName:string,
-    saleItems:Item[],
-    products:Product[]
+    saleItems:Item[] | null,
+    products:Product[]| null
 }
 
 export default function SaleDetails({saleDate,clientName,saleItems,products}:props){
     return(
             <View style={styles.container}>
-                <View>
-                    <Text >Data: {saleDate}</Text>
-                    <Text >Cliente: {clientName}</Text>   
+                <View style={styles.saleData} >
+                    <Text style={{fontWeight:"bold", fontSize:20}}>Data: {new Date(saleDate).toLocaleDateString("pt-br")}</Text>
+                    <Text style={{fontWeight:"bold",fontSize:20}}>Cliente: {clientName}</Text>   
                 </View>
                 <View style={styles.productsArea}>
-                    <Text>Produtos:</Text>
+                    
+                    {products&&saleItems&&
+                    <View>
+                    <Text style={{fontWeight:"bold", fontSize:30}}>Produtos:</Text>
                     <FlatList style={styles.flatList}
                         data={saleItems}
                         renderItem={({item}) =>{
                           const product=products.filter((product)=>product.id===item.productId)[0]
-                        return <View  key={item.id} style={styles.itens}>
+                          return <View  key={item.id} style={styles.itens}>
                             <Text style={styles.itemText}>{product.description}</Text>
-                            <Text style={styles.itemText}>Quantidade:{item.amount}</Text>
+                            <Text style={styles.itemText}>{item.amount}</Text>
                         </View>}}
-                    />
-                </View>          
+                    /></View>
+                    }
+                </View>      
             </View>   
     )
 
@@ -39,8 +43,8 @@ const styles = StyleSheet.create({
       flex: 1,
       flexDirection:"column",
       justifyContent: 'flex-start',
-      alignItems: 'center',
-      paddingBottom:20
+      alignItems: 'flex-start',
+      fontSize:20
     },
     flatList:{
       alignSelf:"flex-start"
@@ -78,5 +82,8 @@ const styles = StyleSheet.create({
     flex:1,
     flexDirection:"column",
     justifyContent:"center"
+  },
+  saleData:{
+    marginBottom:20,
   }
   });

@@ -107,7 +107,7 @@ const showToasts = (client:Client) => {
         
       </View>}
     />
-    <Button title="concluir venda" onPress={()=>save()}></Button>
+    {filteredItens.length>0 ?<Button title="concluir venda" onPress={()=>save()}/>:<Button title="adicionar produtos" onPress={()=>router.back()}/>}
     </View>
     )
   }

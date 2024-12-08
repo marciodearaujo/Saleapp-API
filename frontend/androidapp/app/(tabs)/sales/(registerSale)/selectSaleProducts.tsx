@@ -4,13 +4,13 @@ import { useEffect, useState, useContext } from 'react';
 import GlobalAppContext from '@/contexts/refreshListsContext';
 import { SearchBar } from '@rneui/themed';
 import Product from '@/models/Product';
-import {url as productUrl} from "@/app/(tabs)/products/index"
 import ShoppingCartContext from '@/contexts/shoppingCartContext';
 import ProductForm from '@/components/ProductForm';
-import { postProduct } from '@/backednAPIRequests/productRequests';
+import { getProducts, postProduct } from '@/backednAPIRequests/productRequests';
+
 
 export default function selectSaleProducts() {
-  const {refreshProductList,refreshSaleListNow}=useContext(GlobalAppContext)
+  const {refreshProductList}=useContext(GlobalAppContext)
   const{updateClientCart,selectedClient}=useContext(ShoppingCartContext)
   const[selectedProduct,setSelectedProduct]=useState<Product | null>(null)
   const[products,setProducts]=useState<Array<Product>>([])
@@ -20,28 +20,19 @@ export default function selectSaleProducts() {
   const[amountSelectedProduct,setAmountSelectedProduct]=useState(1)
  
   const filteredproducts=products.filter((product)=>product.description.includes(search)||product.description.toLowerCase().includes(search))
-  const clientId=useLocalSearchParams().id
+  
 
   // console.log(cartProducts)
   
   useEffect(()=>{
-    getProducts()
+    setproductsList()
     setSearch("")
   },[refreshProductList])
 
   
-  function getProducts(){
-    fetch(productUrl,{
-      method:"get"
-    })
-    .then((response)=>{
-      return response.json()
-    }
-    )
-    .then((data)=>{
-      setProducts(data)
-    })
-    .catch((error)=>console.log(error))
+  async function setproductsList(){
+    const products = await getProducts()
+    setProducts(products)
   }
 
   function updateSearch(text:string){
@@ -103,7 +94,7 @@ export default function selectSaleProducts() {
                   }} style={styles.viewText}
             >
                 <Text  style={styles.itemText}>{item.description}</Text>
-                <Text style={styles.amountText}>Estoque:{item.amount}</Text>
+                <Text style={styles.amountText}>Estoque: {item.amount}</Text>
             </Pressable>
             <View>
             </View>   
@@ -117,7 +108,7 @@ export default function selectSaleProducts() {
         <ProductForm getFormData={save} submitButtonText='salvar'/>
       </Modal>
 
-      {/* Modal to define the product amaunt */}
+      {/* Modal to define the product amount */}
       <Modal visible={amountFormVisible} animationType='slide' transparent={true}>
           <Pressable onPress={()=>cancelAndCloseModal()} style={styles.backArea}/>
             <View style={styles.amountData}>

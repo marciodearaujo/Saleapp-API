@@ -4,12 +4,9 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import { useEffect, useState, useContext } from 'react';
 import RefreshListsContext from '@/contexts/refreshListsContext';
 import { SearchBar } from '@rneui/themed';
-import Sale from '@/models/Sale';
-import Client from '@/models/Client';
-import {url as clientUrl} from "@/app/(tabs)/clients/index"
 import ToastManager from 'toastify-react-native';
 import SaleClient from '@/models/SaleClient';
-import { getSaleClient } from '@/backednAPIRequests/saleRequests';
+import { getSaleClient, removeSale } from '@/backednAPIRequests/saleRequests';
 
 
 
@@ -57,16 +54,11 @@ export default function salesScreenList() {
 
 
 
-  async function removeSale(saleClient:SaleClient){
+  async function remove(saleClient:SaleClient){
     if(await confirmRemoveAlert()){
-      fetch(url+"/"+saleClient.id,{
-        method:"delete"
-      })
-      .then(()=>{
-        refreshSaleListNow()
-      }
-      )
-      .catch((error)=>console.log(error))
+      await removeSale(saleClient.id)
+      refreshSaleListNow()
+     
     }       
   }
 
@@ -115,7 +107,7 @@ export default function salesScreenList() {
               </Link>
             </View>
             <View style={styles.icons}>
-              <Ionicons onPress={()=>removeSale(item)} name="trash" size={24} color="black" />
+              <Ionicons onPress={()=>remove(item)} name="trash" size={24} color="black" />
             </View>    
       </View>}}
       />

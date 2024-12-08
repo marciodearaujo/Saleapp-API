@@ -2,10 +2,9 @@ import {router, useLocalSearchParams} from "expo-router";
 import { View,Button, StyleSheet, Alert} from "react-native";
 import RefreshListsContext from "@/contexts/refreshListsContext";
 import { useContext, useEffect, useState } from "react";
-import {url} from "./index"
 import Product from "@/models/Product";
 import ProductDetails from "@/components/ProductDetais";
-import { getProductById } from "@/backednAPIRequests/productRequests";
+import { getProductById, removeProductById } from "@/backednAPIRequests/productRequests";
 
 
 const confirmRemoveAlert = async (product:Product)=>{
@@ -40,22 +39,12 @@ export default function productDetails(){
     }
     
     async function removeproduct(product:Product){
-        if(await confirmRemoveAlert(product)){
-          fetch(url+"/"+product.id,{
-            method:"delete"
-          })
-          .then(()=>{
-            refreshProductListNow()
-            router.back()
-          }
-          )
-          .catch((error)=>console.log(error))
-    
+        if(await confirmRemoveAlert(product)&&product.id){
+          removeProductById(product.id)
+          refreshProductListNow()
         }       
       }
    
-    
-
     return(
         <View style={styles.container}>
             <ProductDetails product={productDetails}/>

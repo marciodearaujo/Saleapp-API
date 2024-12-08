@@ -5,11 +5,9 @@ import { useEffect, useState, useContext } from 'react';
 import RefreshListsContext from '@/contexts/refreshListsContext';
 import { SearchBar } from '@rneui/themed';
 import Client from '@/models/Client';
-import { getClients } from '@/backednAPIRequests/clientRequests';
+import { getClients, removeClientById } from '@/backednAPIRequests/clientRequests';
 import  ToastManager from "toastify-react-native";
 
-//This variable define basic url to clients resources
-export const  url="http://34.232.74.209:3001/clients"
 
 const confirmRemoveAlert = (client:Client)=>{
   return new Promise<boolean>((resolve,reject)=>{
@@ -45,17 +43,11 @@ export default function clientsScreenList() {
 
 
   async function removeClient(client:Client){
-    if(await confirmRemoveAlert(client)){
-      fetch(url+"/"+client.id,{
-        method:"delete"
-      })
-      .then(()=>{
-        refreshClientListNow()
-      }
-      )
-      .catch((error)=>console.log(error))
-    }       
+    if(await confirmRemoveAlert(client)&&client.id){
+      await removeClientById(client.id)
+      refreshClientListNow()    
   }
+}
 
 
   function updateSearch(text:string){
@@ -84,7 +76,7 @@ export default function clientsScreenList() {
           <View key={item.id} style={styles.itens}>
             <View style={styles.viewText}>
               <Link href={{
-                pathname:"/(tabs)/clients/describeClient",
+                pathname:`/(tabs)/clients/describeClient`,
                 params:{
                   id:item.id,
                   name:item.name,
