@@ -2,6 +2,7 @@ import {Entity, model, property, belongsTo, hasMany} from '@loopback/repository'
 import {Client} from './client.model';
 import {Product} from './product.model';
 import {Item} from './item.model';
+import {PaymentPortion} from './payment-portion.model';
 
 @model({
   settings:{
@@ -27,6 +28,16 @@ export class Sale extends Entity {
   })
   saleDate: string;
 
+  @property({
+    type: 'number',
+  })
+  total?: number;
+
+  @property({
+    type: 'string',
+  })
+  status: string;
+
   @belongsTo(() => Client, {keyFrom: 'clientId'}, {name: 'client_id'})
   clientId: number;
 
@@ -35,6 +46,9 @@ export class Sale extends Entity {
 
   @hasMany(() => Item)
   items: Item[];
+
+  @hasMany(() => PaymentPortion)
+  paymentPortions: PaymentPortion[];
 
   constructor(data?: Partial<Sale>) {
     super(data);

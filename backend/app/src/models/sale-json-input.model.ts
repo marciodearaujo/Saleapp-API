@@ -1,5 +1,6 @@
 import {Model, model, property} from '@loopback/repository';
 import {Item} from './item.model';
+import {Product} from './product.model';
 
 @model()
 export class SaleJsonInput extends Model {
@@ -23,11 +24,23 @@ export class SaleJsonInput extends Model {
   clientId: number;
 
   @property({
+    type: 'number',
+    required: true,
+  })
+  portionsNumber: number;
+
+  @property({
+    type: 'number',
+    required: true,
+  })
+  portionPayDayLimit: number;
+
+  @property({
     type: 'array',
     itemType: 'object',
     required: true,
   })
-  products: Object[];
+  products: Product[];
 
 
   constructor(data?: Partial<SaleJsonInput>) {
